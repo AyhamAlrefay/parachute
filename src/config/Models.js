@@ -1,6 +1,8 @@
 import * as THREE from "three";
 
-export const loadModels = (scene, gltfLoader, intersectObjects) => {
+export const loadModels = (scene, gltfLoader) => {
+
+
   gltfLoader.load("models/plants/scene.gltf", (gltfModel) => {
     gltfModel.scene.scale.set(1.5, 1.5, 1.5);
     for (let i = 0; i < 130; i++) {
@@ -12,6 +14,8 @@ export const loadModels = (scene, gltfLoader, intersectObjects) => {
       scene.add(plants);
     }
   });
+
+
   gltfLoader.load("models/fens/scene.gltf", (gltfModel) => {
     gltfModel.scene.scale.set(15, 15, 15);
     gltfModel.scene.position.set(-120, 4, 40);
@@ -24,13 +28,16 @@ export const loadModels = (scene, gltfLoader, intersectObjects) => {
       }
     });
 
+
     let fens;
 
+    
     for (let i = -18; i < 18; i++) {
       fens = gltfModel.scene.clone();
       fens.position.z = fens.position.z * i;
       scene.add(fens);
     }
+    
     gltfModel.scene.position.set(270, 4, 40);
     gltfModel.scene.rotation.y = Math.PI * 0.5;
 
@@ -41,6 +48,8 @@ export const loadModels = (scene, gltfLoader, intersectObjects) => {
       fens2.position.z = fens2.position.z * i;
       scene.add(fens2);
     }
+    
+    
     gltfModel.scene.rotation.y = Math.PI;
     gltfModel.scene.position.set(24.6, 5, -800);
     let fens3;
@@ -49,5 +58,6 @@ export const loadModels = (scene, gltfLoader, intersectObjects) => {
       fens3.position.x += i * 25;
       scene.add(fens3);
     }
+    
   });
 };

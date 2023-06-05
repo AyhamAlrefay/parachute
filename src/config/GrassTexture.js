@@ -2,9 +2,8 @@ import * as THREE from "three";
 
 const loadGrassTextures = (textureLoader) => {
   const grassTextures = {};
-  const grassColorTexture = textureLoader.load("textures\\grass\\7\\color.png");
+  const grassColorTexture = textureLoader.load("textures\\grass\\color.png");
  
-
   grassColorTexture.repeat.set(65, 65);
 
 
