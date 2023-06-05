@@ -3,7 +3,8 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/orbitcontrols";
 import loadGrassTextures from "./config/GrassTexture";
-import { loadModels } from "./config/Models";
+import { loadModelsGltf } from "./config/ModelsGltf";
+import { loadModelsObj } from "./config/ModelsObj";
 import { CylinderBufferGeometry, PlaneBufferGeometry } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
@@ -31,6 +32,7 @@ const loadingManger = new THREE.LoadingManager(
 );
 
 const gltfLoader = new GLTFLoader(loadingManger);
+const objLoader = new OBJLoader(loadingManger);
 
 const textureLoader = new THREE.TextureLoader(loadingManger);
 
@@ -41,10 +43,8 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
 });
 
 const grassTextures = loadGrassTextures(textureLoader);
-
-loadModels(scene, gltfLoader);
-
-
+loadModelsGltf(scene, gltfLoader);
+loadModelsObj(scene,objLoader);
 window.addEventListener("dblclick", () => {
   const fullScreen =
     document.fullscreenElement || document.webkitFullscreenElement;
@@ -77,6 +77,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 camera.position.set(0, 10, 740);
+
 scene.add(camera);
 
 
