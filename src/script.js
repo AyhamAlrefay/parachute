@@ -1,7 +1,6 @@
 import "./styles.css";
 import * as THREE from "three";
 import * as dat from "dat.gui";
-import { OrbitControls } from "three/examples/jsm/controls/orbitcontrols";
 import loadGrassTextures from "./config/GrassTexture";
 import { loadModelsGltf } from "./config/ModelsGltf";
 import { loadModelsObj, animateFeet } from "./config/ModelsObj";
