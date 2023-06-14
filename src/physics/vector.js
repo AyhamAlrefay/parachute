@@ -1,169 +1,174 @@
-import { normalize } from "gsap/gsap-core";
+import * as THREE from 'three';
+class vector {
 
-var vector = {
-  _x: 0,
-  _y: 0,
-  _z: 0,
+    constructor(x,y,z)
+    {
+       this.x = x || 0 ;
+       this. y = y || 0 ;
+       this. z = z || 0;
+   
+   ///////// لارجاع مركبات شعاع
+   }
+   //////////////////////////
+    setX(X)
+    {
+        this.x=x ;
+        return this;
+    }
+ ////////////////////////////////  
+    setY(y)
+    {
+        this.y=y;
+        return this;
+    }
 
-  create: function (x, y, z) {
-    var obj = Object.create(this);
-    obj.setX(x);
-    obj.setY(y);
-    obj.setZ(z);
-    return obj;
-  },
+/////////////////////////////////////////
+    setZ(z)
+    {
+        this.z=z;
+        return this;
+    }
 
-  setX: function (value) {
-    this._x = value;
-  },
+    getX(X)
+    {
+        this.x ;
+        return this;
+    }
+ ////////////////////////////////  
+    getY(y)
+    {
+        this.y ;
+        return this;
+    }
 
-  getX: function () {
-    return this._x;
-  },
-
-  setY: function (value) {
-    this._y = value;
-  },
-
-  getY: function () {
-    return this._y;
-  },
-
-  setZ: function (value) {
-    this._z = value;
-  },
-
-  getZ: function () {
-    return this._z;
-  },
-
-  setAngleXY: function (angle) {
-    var length = this.getLength();
-    this._x = Math.cos(angle) * length;
-    this._y = Math.sin(angle) * length;
-  },
-
-  setAngle: function (angleXY, angleXZ, angelZY) {
-    var length = this.getLength();
-    this._x = Math.cos(angleXZ) * length; // alpha
-    this._y = Math.cos(angleXY) * length; // Beta
-    this._z = Math.cos(angelZY) * length; //gamma
-  },
-
-  inits: function (length, angleXY, angleXZ) {
-    this._x = Math.cos(angleXY) * Number(Math.cos(angleXZ).toFixed(7)) * length;
-    this._y = Math.sin(angleXY) * length;
-    this._z = Math.cos(angleXY) * Math.sin(angleXZ) * length;
-  },
-
-  getAngleXY: function () {
-    return Math.atan(this._y / this._x) || 0;
-  },
-
-  getAngleXZ: function () {
-    return Math.atan2(this._x, this._z) || 0;
-  },
-
-  getAngleZY: function () {
-    return Math.atan(this._y / this._z) || 0;
-  },
-
-  setLength: function (length) {
-    var angleXY = Number(this.getAngleXY().toFixed(1));
-    var angleXZ = Number(this.getAngleXZ().toFixed(1));
-    let l1 = Number(Math.cos(angleXY).toFixed(1));
-    let l2 = Number(Math.cos(angleXZ).toFixed(1));
-
-    this._x = l1 * l2 * length;
-    this._y = Number(Math.sin(angleXY).toFixed(2)) * length;
-    this._z =
-      Number(Math.cos(angleXY).toFixed(2)) *
-      Number(Math.sin(angleXZ).toFixed(2)) *
-      length;
-  },
-
-  getLength: function () {
-    return Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
-  },
-
-  add: function (v2) {
-    return vector.create(
-      this._x + v2.getX(),
-      this._y + v2.getY(),
-      this._z + v2.getZ()
-    );
-  },
-  sumToXZ: function (v) {
-    this._x -= v;
-    this._z -= v;
-  },
-
-  // subtract: function(v2) {
-  // 	return vector.create(this._x - v2.getX(), this._y - v2.getY());
-  // },
-
-  multiply: function (val) {
-    return vector.create(this._x * val, this._y * val, this._z * val);
-  },
-
-  divide: function (vec) {
-    return vector.create(
-      this._x / vec.getX(),
-      this._y / vec.getY(),
-      this._z / vec.getZ()
-    );
-  },
-
-  addTo: function (v2, time) {
-    this._y += v2.getY() * time;
-    this._z += v2.getZ() * time;
-    this._x += v2.getX() * time;
-  },
-
-  // subtractFrom: function(v2) {
-  // 	this._x -= v2.getX();
-  // 	this._y -= v2.getY();
-  // },
-
-  multiplyBy: function (val) {
-    this._x *= val;
-    this._y *= val;
-    this._z *= val;
-  },
-
-  divideBy: function (val) {
-    this._x /= val;
-    this._y /= val;
-    this._z /= val;
-  },
-
-  squere: function () {
-    return this.getLength() * this.getLength();
-  },
-
-  normalize: function () {
-    return vector.create(
-      this._x / this.getLength() || 0,
-      this._y / this.getLength() || 0,
-      this._z / this.getLength() || 0
-    );
-  },
-  getAxesFrom: function (vec) {
-    this._x = (vec._x / vec._x) | 0;
-    this._y = (vec._y / vec._y) | 0;
-    this._z = (vec._z / vec._z) | 0;
-  },
-
-  cross: function (vec) {
-    return vector.create(
-      this._z * vec.getY() - this._y * vec.getZ(),
-      this._z * vec.getX() - this._x * vec.getZ(),
-      this._y * vec.getX() - this._x * vec.getY()
-    );
-  },
-
-  clone: function () {
-    return vector.create(this._x, this._y, this._z);
-  },
-};
+/////////////////////////////////////////
+    getZ(z)
+    {
+        this.z ;
+        return this;
+    }
+//////////////////////////////////
+   set(x,y,z)
+   {
+       this.x = x ;
+       this.y = y ;
+       this.z = z ;
+       return this ;
+   }
+   //////لنسخ مركبات شعاع
+   copy (v)
+   {
+       this.x=v.x;
+       this.y=v.y;
+       this.z=v.z;
+       return this ;
+   
+   }
+   //////
+   clone ()
+   {return new vector ( this.x ,this.y ,this.z )}
+   
+    add(v)
+    {
+       this.x+=v.x;
+       this.y+=v.y;
+       this.z+=v.z;
+       return this;
+    }
+    sub(v)
+    {
+       this.x-=v.x;
+       this.y-=v.y;
+       this.z-=v.z;
+       return this;
+    }
+    /////
+    multiplyScalar(s)
+    {
+       this.x*=s;
+       this.y*=s;
+       this.z*=s;
+       return this;
+    }
+    DivideScalar(s)
+    {
+       this.x/=s;
+       this.y/=s;
+       this.z/=s;
+       return this;
+    }
+    ///////
+    length()
+    {
+       return Math.sqrt(this.x * this.x + this.y * this.y , this.z * this.z)
+    }
+    ///////
+    normalize()
+    { return this.multiplyScalar( 1/this.length() )}
+   
+    ///////
+    dot(v)
+    {
+       return this.x * v.x + this.y * v.x + this.z * v.z ;
+    }
+     
+    cross (v)
+    {
+       const x = this.y * v.z - this.z * v.y;
+       const y = this.z * v.x - this.x * v.z;
+       const z = this.x * v.y - this.y * v.x;
+       return new vector( x, y, z );
+    }
+    distanceTo(v)
+    {
+       const dx = this.x - v.x ;
+       const dy = this.y - v.y ;
+       const dz = this.z - v.z ;
+       return Math.sqrt(dx * dx + dy * dy + dz * dz);
+   
+    }
+    
+   }
+   /*
+   const v1 = new vector(1,3,5);
+   const v2 = new vector(3,2,4);
+   
+   ////////print(v1);
+   const mass = 80;
+   const area = 1.5 ;
+   const height = 3000 ;
+   const drag = 1.2 ;
+   const gravity = 9.8 ;
+   const airdensity = 1.225 ;
+    
+   const va = new THREE.vector(0,0,0);
+   const ve = new THREE.vector(0,0,0);
+   const velocity = new THREE.velocity(va,ve);
+     
+     
+   //////القوى  
+   const forceGravity = new vector(0,0,0);
+   const forceDrag = new vector(0,0,0);
+   //const velocity = new vector(0,0,0);
+   const acceleration = new vector(0,0,0);
+   const position = new vector(0,0,height);
+   
+   
+   //////
+   while(position.z > 0) {
+     const  forceGravity = new vector(0 ,0 , -mass* gravity) ;
+     const forceDrag  = new vector (0 ,0 , -0.5* airdensity * velocity.z * velocity.z * drag * area) ; 
+     const acceleration = forceGravity .add(forceDrag). multiplyScalar(1/mass);
+     const velocity = velocity . add(acceleration. multiplyScalar(0.1));
+     const position = position . add (velocity.multiplyScalar(0.1));
+     const time = time + 0.1 ;
+   
+   }
+   print (forceDrag);
+   print (forceGravity);
+   print (acceleration);
+   print (velocity);
+   print (position);
+   export { vector};   
+   */
 export default vector;
