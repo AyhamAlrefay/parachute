@@ -1,4 +1,6 @@
 import * as THREE from "three";
+
+export const loadModelsGltf = (scene, gltfLoader) => {
   gltfLoader.load("models/plants/scene.gltf", (gltfModel) => {
     gltfModel.scene.scale.set(1.5, 1.5, 1.5);
     for (let i = 0; i < 130; i++) {
@@ -16,22 +18,13 @@ import * as THREE from "three";
     gltfModel.scene.position.set(-120, 4, 40);
     gltfModel.scene.rotation.y = Math.PI * 0.5;
 
-    gltfModel.scene.traverse(function (node) {
-      if (node instanceof THREE.Mesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
-      }
-    });
+    let fens;
 
-let fens;
-
-    
     for (let i = -18; i < 18; i++) {
       fens = gltfModel.scene.clone();
       fens.position.z = fens.position.z * i;
       scene.add(fens);
     }
-    
     gltfModel.scene.position.set(270, 4, 40);
 
 
@@ -52,6 +45,5 @@ let fens;
       fens3.position.x += i * 25;
       scene.add(fens3);
     }
-    
   });
-
+};

@@ -7,6 +7,7 @@ import { loadModelsGltf } from "./config/ModelsGltf";
 import { loadModelsObj } from "./config/ModelsObj";
 import { CylinderBufferGeometry, PlaneBufferGeometry } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
 const gui = new dat.GUI();
 gui.close();
@@ -43,6 +44,7 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
 });
 
 const grassTextures = loadGrassTextures(textureLoader);
+
 loadModelsGltf(scene, gltfLoader);
 loadModelsObj(scene,objLoader);
 window.addEventListener("dblclick", () => {
@@ -76,8 +78,7 @@ const camera = new THREE.PerspectiveCamera(
   1600
 );
 
-camera.position.set(0, 10, 740);
-
+camera.position.set(0, 10, 720);
 scene.add(camera);
 
 
