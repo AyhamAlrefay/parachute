@@ -63,17 +63,22 @@ const keys = {
   down: false,
   left: false,
   right: false,
+  l:false,
+  r:false,
+
 };
 // Event handler functions
 function onKeyDown(event) {
-  if (event.code === 'KeyW') {
-    keys.w = true;
-    animateFeet();
+  if (event.code === 'KeyW') keys.w = true;
+  if (event.code === 'KeyL') {keys.l = true;
+  animateFeet();
   }
+  
+  if (event.code === 'KeyR') {keys.r = true;
+    animateFeet();
+    }
   if (event.code === 'KeyA') keys.a = true;
-  if (event.code === 'KeyS'){ keys.s = true;
-    animateFeet();
-  }
+  if (event.code === 'KeyS') keys.s = true;
   if (event.code === 'KeyD') keys.d = true;
   if (event.code === 'ArrowUp') keys.up = true;
   if (event.code === 'ArrowDown') keys.down = true;
@@ -84,6 +89,8 @@ function onKeyDown(event) {
 function onKeyUp(event) {
   if (event.code === 'KeyW') keys.w = false;
   if (event.code === 'KeyA') keys.a = false;
+  if (event.code === 'KeyR') keys.r = false;
+  if (event.code === 'KeyL') keys.l = false;
   if (event.code === 'KeyS') keys.s = false;
   if (event.code === 'KeyD') keys.d = false;
   if (event.code === 'ArrowUp') keys.up = false;
@@ -159,11 +166,11 @@ const tick = () => {
   // Move the models based on the keyboard input
   if (model1 && model2) {
     if (keys.w){ model1.position.z -= 3;
-      animateFeet();
+      animateFeet()
     }
     if (keys.a) model1.position.x -= 1;
     if (keys.s) { model1.position.z += 3;
-      animateFeet();
+      animateFeet()
     }
     if (keys.d) model1.position.x += 1;
 
