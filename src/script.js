@@ -3,7 +3,7 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import loadGrassTextures from "./config/GrassTexture";
 import { loadModelsGltf } from "./config/ModelsGltf";
-import { loadModelsObj, animateFeet } from "./config/ModelsObj";
+import { loadModelsObj } from "./config/ModelsObj";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
@@ -69,14 +69,10 @@ const keys = {
 };
 // Event handler functions
 function onKeyDown(event) {
-  if (event.code === 'KeyW') keys.w = true;
-  if (event.code === 'KeyL') {keys.l = true;
-  animateFeet();
-  }
-  
-  if (event.code === 'KeyR') {keys.r = true;
+  if (event.code === 'KeyW') {
+    keys.w = true;
     animateFeet();
-    }
+  }
   if (event.code === 'KeyA') keys.a = true;
   if (event.code === 'KeyS') keys.s = true;
   if (event.code === 'KeyD') keys.d = true;
@@ -100,8 +96,8 @@ function onKeyUp(event) {
 }
 
 function onMouseMove(event) {
-  camera.rotation.y -= event.movementX * 0.002;
-  camera.rotation.x -= event.movementY * 0.002;
+  camera.rotation.y -= event.movementX * 0.004;
+  camera.rotation.x -= event.movementY * 0.004;
 }
 
  function toggleFullScreen() {
@@ -166,11 +162,11 @@ const tick = () => {
   // Move the models based on the keyboard input
   if (model1 && model2) {
     if (keys.w){ model1.position.z -= 3;
-      animateFeet()
+      animateFeet();
     }
     if (keys.a) model1.position.x -= 1;
     if (keys.s) { model1.position.z += 3;
-      animateFeet()
+      animateFeet();
     }
     if (keys.d) model1.position.x += 1;
 
