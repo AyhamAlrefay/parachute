@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 
 class Vector {
     constructor(x = 0, y = 0, z = 0) {

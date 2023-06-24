@@ -3,7 +3,7 @@ import { TextureLoader } from 'three';
 // Initialize the texture loader
 const textureLoader = new TextureLoader();
 
-export const loadModelsGltf = (scene, gltfLoader) => {
+export const loadModelsGltf = (scene, gltfLoader,parachuteModel) => {
   // Load textures for the parachute model
   const lambert1BaseColor = textureLoader.load("models/parachute/textures/lambert1_baseColor.png");
   const lambert1Emissive = textureLoader.load("models/parachute/textures/lambert1_emissive.jpeg");
@@ -75,10 +75,11 @@ export const loadModelsGltf = (scene, gltfLoader) => {
     });
 
     // Set the position and scale of the parachute model
-    gltfModel.scene.position.set(10, 150, 500);
-    gltfModel.scene.scale.set(25, 25, 25);
+    gltfModel.scene.position.set(25, 0, 90);
+    //gltfModel.scene.scale.set(70, 70, 70);
 
     // Add the parachute model to the scene
     scene.add(gltfModel.scene);
+    parachuteModel(gltfModel.scene);
   });
 };

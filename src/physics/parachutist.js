@@ -12,6 +12,7 @@ class Parachutist {
     windSpeed,
     k
   ) {
+    this.gravity=gravity
     this.k = k; // Rope tension constant
     this.airspeed = airspeed;
     this.windSpeed = windSpeed;
