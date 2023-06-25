@@ -214,8 +214,8 @@ function onKeyUp(event) {
 }
 
 function onMouseMove(event) {
-//  camera.rotation.y -= event.movementX * 0.004;
-  //camera.rotation.x -= event.movementY * 0.004;
+ camera.rotation.y -= event.movementX * 0.004;
+  camera.rotation.x -= event.movementY * 0.004;
 }
 
  function toggleFullScreen() {
