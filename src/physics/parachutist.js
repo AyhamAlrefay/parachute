@@ -31,9 +31,9 @@ class Parachutist {
     this.velocity = new Vector(0, 0, 0);
     this.acceleration = new Vector(0, 0, 0);
     this.position = new Vector(0, -height, 0);
-    this.radius = 6378100.0; // Earth's radius in meters
-    this.G = 6.674 * Math.pow(10, -11); // Universal Gravitation constant in N*m^2/kg^2
-    this.mass_earth = 5.972 * Math.pow(10, 24); // Earth's mass in kg
+    this.radius = 6378100.0; 
+    this.G = 6.674 * Math.pow(10, -11);
+    this.mass_earth = 5.972 * Math.pow(10, 24); 
     this.R = this.radius + this.height;
     this.time = 0;
     this.alpha = 0;
