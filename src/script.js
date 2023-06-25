@@ -7,6 +7,7 @@ import { loadModelsObj ,animateFeet} from "./config/ModelsObj";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import World from "./physics/world";
+import Parachutist from "./physics/parachutist";
 // GUI setup
 const gui = new dat.GUI();
 gui.close();
@@ -83,7 +84,7 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
-
+const p = new Parachutist(100 , 0.2  ,  5 ,0.5,1.2,0.03);
 // Models
 let manModel, airplanModel,parachuteModel;
 // Load textures and models
@@ -214,8 +215,8 @@ function onKeyUp(event) {
 }
 
 function onMouseMove(event) {
-//  camera.rotation.y -= event.movementX * 0.004;
-  //camera.rotation.x -= event.movementY * 0.004;
+  camera.rotation.y -= event.movementX * 0.004;
+  camera.rotation.x -= event.movementY * 0.004;
 }
 
  function toggleFullScreen() {
@@ -271,7 +272,7 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
+modelsGroup.position.y=200;
 let scaleOfParrchute=0;// Animation loop
 const tick = () => {
   // Move the models based on the keyboard input
@@ -279,14 +280,15 @@ const tick = () => {
   if (manModel && airplanModel) {
     airplanModel.position.x+=3;
     
-if (keys.w){ modelsGroup.position.z -= 3;
-      animateFeet(); 
-      if(scaleOfParrchute<=70){
-        console.log(scaleOfParrchute);
-        parachuteModel.scale.set(scaleOfParrchute,scaleOfParrchute,scaleOfParrchute)
-scaleOfParrchute+=1;
-      }
-          }
+if (keys.w){
+  //  modelsGroup.position.z -= 3;
+  //     animateFeet(); 
+  
+  // camera.position.copy(modelsGroup.position);
+  // camera.position.y -= 50;
+  modelsGroup.translateY(p.position.y);
+
+}
     if (keys.a) modelsGroup.position.x -= 1;
     if (keys.s) { modelsGroup.position.z += 3;
       animateFeet()
@@ -300,6 +302,8 @@ scaleOfParrchute+=1;
 
   }
 
+
+  
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
