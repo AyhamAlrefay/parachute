@@ -37,8 +37,8 @@ class parachutist
         this.forceTension =new Vector(0,0,0);
         this.totalForce =new Vector(0,0,0);
         this.gravity = new Vector(0, -9.8, 0); // قوة الجاذبية
-        this.position = new Vector(0, 0, 0); // الموضع الأولي للمظلي
-        this.velocity = new Vector(0, 1, 0); 
+        this.position = new Vector(0,0, 0); // الموضع الأولي للمظلي
+        this.velocity = new Vector(0, -1, 0); 
         this.acceleration = new Vector(0, 0, 0);// السرعة الأولية للمظلي
         this.mass = mass;
         this.airResistance = airResistance; 
@@ -55,7 +55,7 @@ calculateAirResistanceForce() {
     var speed = this.velocity.length();
     var direction = this.velocity.clone().normalize();
     var dragForceMagnitude = 0.5*this.airResistance*this.airdesity * this.area*speed * speed;
-    return direction.multiplyScalar(-dragForceMagnitude);
+    return direction.multiplyScalar(dragForceMagnitude);
   }
   calculateForceWind()
         {
@@ -79,7 +79,7 @@ calculateAirResistanceForce() {
 calculateAcceleration() {
     var gravityForce = this.calculateGravityForce();
     var airResistanceForce = this.calculateAirResistanceForce();
-    var netForce = gravityForce.add(airResistanceForce);
+    var netForce = gravityForce.sub(airResistanceForce);
     return netForce.clone().divideScalar(this.mass);
 }
 
@@ -95,7 +95,7 @@ calculateAcceleration() {
 
 // دورة التحديث لحركة المظلي
  updateParachutist(deltaTime) {
-  if(this.height===1)
+  if(this.height<0)
   return;
   // حساب التسارع()
   this.height = this.position.y;
@@ -109,12 +109,15 @@ calculateAcceleration() {
 
   // عرض نتائج الحركة
  
- 
-  console.log("drag:", this.calculateAirResistanceForce());
-  console.log("Position:", this.position);
-  console.log("Height:", this.height);
-  console.log("Velocity:", this.velocity);
-  console.log("Acceleration:", this.acceleration);
+  const valuesContainer = document.getElementById("values-container");
+  valuesContainer.innerHTML = `
+      <p>Position: ${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)}, ${this.position.z.toFixed(2)}</p>
+      <p>Acceleration: ${this.acceleration.x.toFixed(2)}, ${this.acceleration.y.toFixed(2)}, ${this.acceleration.z.toFixed(2)}</p>
+      <p>Velocity: ${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)}, ${this.velocity.z.toFixed(2)}</p>
+
+      <p>Height: ${this.height.toFixed(2)}</p>
+  `;
+  
 } 
    
          

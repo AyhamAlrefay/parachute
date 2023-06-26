@@ -127,65 +127,12 @@ worldfolder
 
 
 // Event listeners
-document.addEventListener('keydown', onKeyDown);
-document.addEventListener('keyup', onKeyUp);
+
 document.addEventListener('mousemove', onMouseMove);
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
-// Keyboard state
-const keys = {
-  w: false,
-  a: false,
-  s: false,
-  d: false,
-  up: false,
-  down: false,
-  left: false,
-  right: false,
-  l:false,
-  r:false,
 
-};
-// Event handler functions
-function onKeyDown(event) {
-  if (event.code === 'KeyW') keys.w = true;
-  if (event.code === 'KeyL') {keys.l = true;
-  animateFeet();
-  }
-  
-  if (event.code === 'KeyR') {keys.r = true;
-    animateFeet();
-    }
-  if (event.code === 'KeyA') keys.a = true;
-  if (event.code === 'KeyS') keys.s = true;
-  if (event.code === 'KeyD') keys.d = true;
-  if (event.code === 'ArrowUp') keys.up = true;
-  if (event.code === 'ArrowDown') keys.down = true;
-  if (event.code === 'ArrowLeft') keys.left = true;
-  if (event.code === 'ArrowRight') keys.right = true;
-}
-
-function onKeyUp(event) {
-  if (event.code === 'KeyW') keys.w = false;
-  if (event.code === 'KeyA') keys.a = false;
-  if (event.code === 'KeyR') keys.r = false;
-  if (event.code === 'KeyL') keys.l = false;
-  if (event.code === 'KeyS') keys.s = false;
-  if (event.code === 'KeyD') keys.d = false;
-  if (event.code === 'ArrowUp') keys.up = false;
-  if (event.code === 'ArrowDown') keys.down = false;
-  if (event.code === 'ArrowLeft') keys.left = false;
-  if (event.code === 'ArrowRight') keys.right = false;
-  // Check if the entered word is 'example'
-  if (event.code === 'Enter') {
-    const input = prompt('Enter a word:');
-    if (input.toLowerCase() === 'example') {
-      // Do something when the word 'example' is entered
-      console.log('Entered the word "example"');
-    }
-  }
-}
 
 function onMouseMove(event) {
   camera.rotation.y -= event.movementX * 0.004;
@@ -245,40 +192,19 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=1000;
+modelsGroup.position.y=100;
 const p = new Parachutist(100,20,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
 
 let scaleOfParrchute=0;// Animation loop
+
 const tick = () => {
   // Move the models based on the keyboard input
   
   if (manModel && airplanModel) {
     airplanModel.position.x+=3;
     
-if (keys.w){
-  //  modelsGroup.position.z -= 3;
-  //     animateFeet(); 
-  
-  // camera.position.copy(modelsGroup.position);
-  // camera.position.y -= 50;
-
-
-}
-    if (keys.a) modelsGroup.position.x -= 1;
-    if (keys.s) { modelsGroup.position.z += 3;
-      animateFeet()
-    }
-    if (keys.d) modelsGroup.position.x += 1;
-
-    if (keys.up) airplanModel.position.z -= 3;
-    if (keys.left) airplanModel.position.x -= 1;
-    if (keys.down) airplanModel.position.z += 3;
-    if (keys.right) airplanModel.position.x += 1;
-
   }
- 
-
-  
+   
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
