@@ -58,10 +58,7 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
-<<<<<<< HEAD
-const p = new Parachutist(200 , 0.2  ,  5 ,0.5,1.2,0.03);
-=======
->>>>>>> 754ae9dfade41804cda363069b2aa70360818b19
+
 // Models
 let manModel, airplanModel,parachuteModel;
 // Load textures and models
@@ -283,9 +280,11 @@ if (keys.w){
     if (keys.right) airplanModel.position.x += 1;
     // Update the physics simulation
   const deltaTime = 0.1; // Time step in seconds
-  if(p.position.getY>0)
-  p.updatePhysics(deltaTime);
-  console.log(p.position.gety);
+  if(p.position.getY>65)
+   { p.updateParachutist(deltaTime);
+    console.log(p.position.gety);}
+
+
   // Update the position of the models based on the position of the Parachutist object
   if (parachuteModel && manModel) {
     parachuteModel.position.copy(p.position);
@@ -308,14 +307,16 @@ const scaleParachute = () => {
     requestAnimationFrame(scaleParachute);
   }
 };
-
+let grassTextureHeight = -900;
 const physics=()=>{
-  p.updateParachutist(0.1)
-   if(modelsGroup.position.y>0){
-    modelsGroup.translateY(p.position.y);
-camera.position.set(0, modelsGroup.position.y+20, 720);
-    
-  }
+
+
+ 
+ if ( modelsGroup.position.y >= grassTextureHeight) {
+  p.updateParachutist(0.1);
+  modelsGroup.translateY(p.position.y);
+  camera.position.set(0, modelsGroup.position.y + 20, 720);
+}
   requestAnimationFrame(physics);
 }
 
