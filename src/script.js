@@ -36,33 +36,7 @@ const paramters = {
   frictionCoeff: 0.8,
   mass: 1000,
   speed: 20,
-  type: 0,
-  types: {
-    default() {
-      paramters.type = 0;
-      paramters.ballTextures = ballTextures[0];
-      coefficientsFolder.show();
-      massController.domElement.hidden = false;
-    },
-    wood() {
-      paramters.type = 1;
-      paramters.ballTextures = ballTextures[1];
-      coefficientsFolder.hide();
-      massController.domElement.hidden = true;
-    },
-    steal() {
-      paramters.type = 2;
-      paramters.ballTextures = ballTextures[0];
-      coefficientsFolder.hide();
-      massController.domElement.hidden = true;
-    },
-    rubber() {
-      paramters.type = 3;
-      paramters.ballTextures = ballTextures[2];
-      coefficientsFolder.hide();
-      massController.domElement.hidden = true;
-    },
-  },
+ 
 };
 // Scene setup
 const size = {
@@ -80,11 +54,10 @@ const modelsGroup = new THREE.Group();
 
 // Background setup
 const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
-  const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
+  const rt = new THREE.WebGLCubeRenderTarget(texture.image.height*5);
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
-const p = new Parachutist(100 , 0.2  ,  5 ,0.5,1.2,0.03);
 // Models
 let manModel, airplanModel,parachuteModel;
 // Load textures and models
@@ -272,7 +245,9 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=200;
+modelsGroup.position.y=1000;
+const p = new Parachutist(100,20,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
+
 let scaleOfParrchute=0;// Animation loop
 const tick = () => {
   // Move the models based on the keyboard input
@@ -286,7 +261,7 @@ if (keys.w){
   
   // camera.position.copy(modelsGroup.position);
   // camera.position.y -= 50;
-  modelsGroup.translateY(p.position.y);
+
 
 }
     if (keys.a) modelsGroup.position.x -= 1;
@@ -301,7 +276,7 @@ if (keys.w){
     if (keys.right) airplanModel.position.x += 1;
 
   }
-
+ 
 
   
   renderer.render(scene, camera);
@@ -317,10 +292,24 @@ const scaleParachute = () => {
   }
 };
 
+const physics=()=>{
+  p.updateParachutist(0.1)
+   if(modelsGroup.position.y>0){
+    modelsGroup.translateY(p.position.y);
+camera.position.set(0, modelsGroup.position.y+20, 720);
+    
+  }
+  requestAnimationFrame(physics);
+}
+
 document.addEventListener('keydown', function(event) {
   if (event.key === 'o') {
     // Call the scaleParachute function here
     scaleParachute();
+    
+  }
+  if(event.key==='w'){
+    physics();
   }
 });
 tick();
