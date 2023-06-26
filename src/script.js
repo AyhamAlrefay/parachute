@@ -84,7 +84,7 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
-const p = new Parachutist(100 , 0.2  ,  5 ,0.5,1.2,0.03);
+const p = new Parachutist(200 , 0.2  ,  5 ,0.5,1.2,0.03);
 // Models
 let manModel, airplanModel,parachuteModel;
 // Load textures and models
@@ -304,8 +304,9 @@ if (keys.w){
     if (keys.right) airplanModel.position.x += 1;
     // Update the physics simulation
   const deltaTime = 0.1; // Time step in seconds
+  if(p.position.getY>0)
   p.updatePhysics(deltaTime);
-
+  console.log(p.position.gety);
   // Update the position of the models based on the position of the Parachutist object
   if (parachuteModel && manModel) {
     parachuteModel.position.copy(p.position);

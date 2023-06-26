@@ -12,7 +12,6 @@ class Parachutist {
     windSpeed,
     k
   ) {
-    this.gravity=gravity
     this.k = k; // Rope tension constant
     this.airspeed = airspeed;
     this.windSpeed = windSpeed;
@@ -20,8 +19,9 @@ class Parachutist {
     this.area = area;
     this.height = height;
     this.drag = drag;
-    this.gravity = 9.8;
+    this.gravity = gravity;
     this.airDensity = airDensity;
+    
     this.forceGravity = new Vector(0, 0, 0);
     this.forceDrag = new Vector(0, 0, 0);
     this.forceWind = new Vector(0, 0, 0);
@@ -44,7 +44,6 @@ class Parachutist {
     return degrees * Math.PI / 180;
   }
 
-  // Calculate drag force
   calculateForceDrag() {
     this.forceDrag = new Vector(
       -0.5 *
@@ -69,7 +68,6 @@ class Parachutist {
     );
   }
 
-  // Calculate gravitational force
   calculateForceGravity() {
     this.forceGravity = new Vector(
       0,
@@ -78,7 +76,6 @@ class Parachutist {
     );
   }
 
-  // Calculate wind force
   calculateForceWind() {
     this.forceWind = new Vector(
       0.5 * this.airDensity * this.area * this.drag * Math.pow(this.windSpeed, 2),
@@ -87,7 +84,6 @@ class Parachutist {
     );
   }
 
-  // Calculate air pressure force
   calculateForceAirPressure() {
     this.forcePressure = new Vector(
       0,
@@ -96,12 +92,10 @@ class Parachutist {
     );
   }
 
-  // Calculate rope tension force
   calculateForceRopeTension() {
     this.forceTension = new Vector(0, -this.velocity.length() * this.k, 0);
   }
 
-  // Calculate total force
   calculateTotalForce() {
     this.totalForce
       .copy(this.forceGravity)
@@ -111,23 +105,19 @@ class Parachutist {
       .add(this.forceTension);
   }
 
-  // Calculate acceleration
   calculateAcceleration() {
     this.acceleration.copy(this.totalForce).multiplyScalar(1 / this.mass);
   }
 
-  // Calculate velocity
   calculateVelocity(deltaTime) {
     this.velocity.add(this.acceleration.clone().multiplyScalar(deltaTime));
   }
 
-  // Calculate position
   calculatePosition(deltaTime) {
     this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
     this.height = this.position.y;
   }
 
-  // Update physics
   updatePhysics(deltaTime) {
     this.calculateForceDrag();
     this.calculateForceGravity();
