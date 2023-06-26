@@ -37,9 +37,9 @@ class parachutist
         this.forceTension =new Vector(0,0,0);
         this.totalForce =new Vector(0,0,0);
         this.gravity = new Vector(0, -9.8, 0); // قوة الجاذبية
-        this.position = new Vector(0,0, 0); // الموضع الأولي للمظلي
+        this.position = new Vector(0,this.height, 0); // الموضع الأولي للمظلي
         this.velocity = new Vector(0, -1, 0); 
-        this.acceleration = new Vector(0, 0, 0);// السرعة الأولية للمظلي
+        this.acceleration = new Vector(0, -1, 0);// السرعة الأولية للمظلي
         this.mass = mass;
         this.airResistance = airResistance; 
         this.airspeed=airspeed;
@@ -55,7 +55,7 @@ calculateAirResistanceForce() {
     var speed = this.velocity.length();
     var direction = this.velocity.clone().normalize();
     var dragForceMagnitude = 0.5*this.airResistance*this.airdesity * this.area*speed * speed;
-    return direction.multiplyScalar(dragForceMagnitude);
+    return direction.multiplyScalar(-dragForceMagnitude);
   }
   calculateForceWind()
         {
@@ -79,13 +79,13 @@ calculateAirResistanceForce() {
 calculateAcceleration() {
     var gravityForce = this.calculateGravityForce();
     var airResistanceForce = this.calculateAirResistanceForce();
-    var netForce = gravityForce.sub(airResistanceForce);
-    return netForce.clone().divideScalar(this.mass);
+    var netForce = gravityForce.add(airResistanceForce);
+    return new Vector(0,(gravityForce.y+airResistanceForce.y)/this.mass,0);
 }
 
 // حساب السرعة باستخدام التسارع
  calculateVelocity(deltaTime) {
-  return this.velocity.clone().add(this.acceleration.multiplyScalar(deltaTime));
+  return this.velocity.add(this.acceleration.multiplyScalar(deltaTime));
 }
 
 // حساب الموضع باستخدام السرعةx = x₀ + v₀t + (1/2)at²
@@ -97,6 +97,10 @@ calculateAcceleration() {
  updateParachutist(deltaTime) {
   if(this.height<0)
   return;
+
+
+  this.calculateGravityForce();
+  this.calculateAirResistanceForce();
   // حساب التسارع()
   this.height = this.position.y;
    this.acceleration = this.calculateAcceleration();
@@ -112,10 +116,11 @@ calculateAcceleration() {
   const valuesContainer = document.getElementById("values-container");
   valuesContainer.innerHTML = `
       <p>Position: ${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)}, ${this.position.z.toFixed(2)}</p>
-      <p>Acceleration: ${this.acceleration.x.toFixed(2)}, ${this.acceleration.y.toFixed(2)}, ${this.acceleration.z.toFixed(2)}</p>
-      <p>Velocity: ${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)}, ${this.velocity.z.toFixed(2)}</p>
-
       <p>Height: ${this.height.toFixed(2)}</p>
+      <p>Acceleration: ${this.calculateAcceleration().x.toFixed(2)}, ${this.calculateAcceleration().y.toFixed(2)}, ${this.calculateAcceleration().z.toFixed(2)}</p>
+      <p>Velocity: ${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)}, ${this.velocity.z.toFixed(2)}</p>
+      <p>GravityForce: ${this.calculateGravityForce().x.toFixed(2)}, ${this.calculateGravityForce().y.toFixed(2)}, ${this.calculateGravityForce().z.toFixed(2)}</p>
+      <p>AirResistanceForce: ${this.calculateAirResistanceForce().x.toFixed(2)}, ${this.calculateAirResistanceForce().y.toFixed(2)}, ${this.calculateAirResistanceForce().z.toFixed(2)}</p>
   `;
   
 } 
