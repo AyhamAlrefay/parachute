@@ -68,7 +68,7 @@ const model1Promise = new Promise((resolve, reject) => {
         if (child.isMesh) {
           child.material.map = ninjaTexture;
           child.material.needsUpdate = true;
-    console.log(child.name)
+
           
           if (child.name.includes("Ninja_T01:")) {
             if (child.name.includes("Protector_Mano_IZ") || child.name.includes("Mano_IZ")) {
