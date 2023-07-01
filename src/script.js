@@ -192,8 +192,8 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=100;
-const p = new Parachutist(100,20,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
+modelsGroup.position.y=1000;
+const p = new Parachutist(50,10,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
 
 let scaleOfParrchute=0;// Animation loop
 
@@ -217,11 +217,17 @@ const scaleParachute = () => {
     requestAnimationFrame(scaleParachute);
   }
 };
-
+const clock = new THREE.Clock();
+let oldElapsedTime = 0;
 const physics=()=>{
-  p.updateParachutist(0.1)
+  const elapsedTime = clock.getElapsedTime();
+
+  const delteTime = elapsedTime - oldElapsedTime;
+  p.updateParachutist(delteTime)
+  oldElapsedTime = elapsedTime;
+
    if(modelsGroup.position.y>0){
-    modelsGroup.translateY(p.position.y);
+    modelsGroup.position.y=p.position.y;
 camera.position.set(0, modelsGroup.position.y+20, 720);
     
   }
