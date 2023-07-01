@@ -128,7 +128,7 @@ worldfolder
 
 // Event listeners
 
-document.addEventListener('mousemove', onMouseMove);
+// document.addEventListener('mousemove', onMouseMove);
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
@@ -192,8 +192,8 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=100;
-const p = new Parachutist(100,10,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
+modelsGroup.position.y=1000;
+const p = new Parachutist(100,0.2,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
 
 let scaleOfParrchute=0;// Animation loop
 
@@ -219,7 +219,7 @@ const scaleParachute = () => {
 };
 
 const physics=()=>{
-  p.updateParachutist(0.1)
+  p.updateParachutist(0.3)
    if(modelsGroup.position.y>0){
     modelsGroup.position.y=p.position.y;
 camera.position.set(0, modelsGroup.position.y+20, 720);
