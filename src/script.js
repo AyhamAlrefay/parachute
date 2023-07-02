@@ -128,7 +128,7 @@ worldfolder
 
 // Event listeners
 
-// document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mousemove', onMouseMove);
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
@@ -173,7 +173,7 @@ scene.add(ambientLight);
 
 // Floor setup
 const floor = new THREE.Mesh(
-  new THREE.PlaneBufferGeometry(1500, 1500, 100, 100),
+  new THREE.PlaneBufferGeometry(3000, 3000, 1000, 1000),
   new THREE.MeshStandardMaterial({
     map: grassTextures.grassColorTexture,
     aoMap: grassTextures.grassAmbientOcclusionTexture,
@@ -192,15 +192,39 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=1000;
-const p = new Parachutist(100,0.2,modelsGroup.position.y,0.5,0.03);//constructor( mass ,r ,height , airResistance ,windspeed,airspeed,)
+modelsGroup.position.y=10000;
+const p = new Parachutist();
+ const valuesContainer = document.getElementById("values-container");
+let displacement = new THREE.Vector3(); 
+let velocity = new THREE.Vector3(0, 0, 0); 
+let windSpeed = new THREE.Vector3(0, 0, 0); 
+let tensileForce = new THREE.Vector3(0, 0, 0); 
+let surfaceArea = 20;
+let bodyMass = 50; 
+let umbrellaMass = 1; 
+const groundPosition = new THREE.Vector3(0, 0, 0);
+const update = (delta) => {
+  if (modelsGroup.position.y > groundPosition.y) {
+    let { newVelocity, newDisplacement, newAcceleration } = p.calculateDisplacement(delta, bodyMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+    velocity.copy(newVelocity);
+    displacement.copy(newDisplacement);
+    modelsGroup.position.copy(p.updatePosition(modelsGroup.position, displacement));     
+    valuesContainer.innerHTML = `
+    <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+    <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+    <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+`;
+  
+  }
+};
+
 
 let scaleOfParrchute=0;// Animation loop
-
-const tick = () => {
-  // Move the models based on the keyboard input
+let startTime = new Date().getTime(); // تاريخ البدء لحساب الوقت
+let lastTime = new Date().getTime();
   
-  if (manModel && airplanModel) {
+const tick = () => {
+  if (airplanModel) {
     airplanModel.position.x+=3;
     
   }
@@ -217,27 +241,24 @@ const scaleParachute = () => {
     requestAnimationFrame(scaleParachute);
   }
 };
-
+const clock = new THREE.Clock();
+let oldElapsedTime = 0;
 const physics=()=>{
-  p.updateParachutist(0.3)
-   if(modelsGroup.position.y>0){
-    modelsGroup.position.y=p.position.y;
 camera.position.set(0, modelsGroup.position.y+20, 720);
-    
-  }
+const elapsedTime = clock.getElapsedTime();
+const delteTime = elapsedTime - oldElapsedTime;
+update(delteTime);
+  oldElapsedTime = elapsedTime;
+
   requestAnimationFrame(physics);
 }
 
 document.addEventListener('keydown', function(event) {
   if (event.key === 'o') {
-    // Call the scaleParachute function here
-    scaleParachute();
-    
+    scaleParachute();  
   }
   if(event.key==='w'){
     physics();
   }
 });
 tick();
-
-
