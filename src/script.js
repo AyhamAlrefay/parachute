@@ -128,7 +128,7 @@ worldfolder
 
 // Event listeners
 
-document.addEventListener('mousemove', onMouseMove);
+// document.addEventListener('mousemove', onMouseMove);
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
@@ -225,6 +225,7 @@ const physics=()=>{
   const delteTime = elapsedTime - oldElapsedTime;
   p.updateParachutist(delteTime)
   oldElapsedTime = elapsedTime;
+
 
    if(modelsGroup.position.y>0){
     modelsGroup.position.y=p.position.y;
