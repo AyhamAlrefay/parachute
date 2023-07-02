@@ -247,7 +247,7 @@ const physics=()=>{
 camera.position.set(0, modelsGroup.position.y+20, 720);
 const elapsedTime = clock.getElapsedTime();
 const delteTime = elapsedTime - oldElapsedTime;
-update(delteTime);
+update(delteTime*100);
   oldElapsedTime = elapsedTime;
 
   requestAnimationFrame(physics);
