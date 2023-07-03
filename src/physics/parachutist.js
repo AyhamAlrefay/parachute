@@ -1,130 +1,63 @@
-
-import Vector from "./vector";
+import * as THREE from "three";
 class parachutist
-{
-    
-
-  constructor
-  ( 
-      mass ,
-      r ,
-      height , 
-      airResistance ,
-      windspeed,
-      airspeed,
-    
-  )
-    {
-       
-        this.pi=3.14;
-        this.r=r;
-        this.area = this.pi *this.r*this.r;   //مساحه المظله  
-        this.height = height; 
-        this.airdesity = 1.2;   //كثافة الهواء  
-        this.radius = 6378100.0 //meters 
-        this.G = 6.67 * 10 ^ -11 //Universal Gravitation constant in n*m^2/kg^2
-        this.mass_earth = 5.98 * 10 ^ 24 
-        this.R=this.radius+this.height
-        this.time = 0;
-        this.i=0;
-        this.L=1;
-        this.alpha=0;
-        this.beta=90;
-        this.k=1;
-        this.windspeed=windspeed;
-        this.forceWind =new Vector(0,0,0);
-        this.forcePressure =new Vector(0,0,0);
-        this.forceTension =new Vector(0,0,0);
-        this.totalForce =new Vector(0,0,0);
-        this.gravity = new Vector(0, -9.8, 0); // قوة الجاذبية
-        this.position = new Vector(0,this.height, 0); // الموضع الأولي للمظلي
-        this.velocity = new Vector(0, -1, 0); 
-        this.acceleration = new Vector(0, -1, 0);// السرعة الأولية للمظلي
-        this.mass = mass;
-        this.airResistance = airResistance; 
-        this.airspeed=airspeed;
-        
-    }
-   // كتلة المظلي
-
-// حساب قوة الجاذبية
-calculateGravityForce() {
-    return this.gravity.clone().multiplyScalar(this.mass);
-}
-calculateAirResistanceForce() {
-    var speed = this.velocity.length();
-    var direction = this.velocity.clone().normalize();
-    var dragForceMagnitude = 0.5*this.airResistance*this.airdesity * this.area*speed * speed;
-    return direction.multiplyScalar(-dragForceMagnitude);
-  }
-  calculateForceWind()
-        {
-            this.forceWind = new Vector(0,0,0.5 * this.airdesity* this.area *this.airResistance * Math.pow(this.windspeed , 2));
-            return this.forceWind ;
-        }
-        ///حساب قوة الضغط الجوي 
-        calculateForceAirPressure()
-        {
-            this.forcePressure=  0.5 * this.airdesity * Math.pow(this.airspeed , 2);
-            return this.forcePressure ;
-        }
-        //حساب قوة شد الحبال
-        calculateForceRopeTension()
-        {
-            this.forceTension=  new Vector(0,0,this.k*this.velocity.length());
-            return this.forceTension ;
-        }
-        
-// حساب التسارع باستخدام قوة الجاذبية وكتلة المظلي
-calculateAcceleration() {
-    var gravityForce = this.calculateGravityForce();
-    var airResistanceForce = this.calculateAirResistanceForce();
-    var netForce = gravityForce.add(airResistanceForce);
-    return new Vector(0,(gravityForce.y+airResistanceForce.y)/this.mass,0);
-}
-
-// حساب السرعة باستخدام التسارع
- calculateVelocity(deltaTime) {
-  return this.velocity.add(this.acceleration.multiplyScalar(deltaTime));
-}
-
-// حساب الموضع باستخدام السرعةx = x₀ + v₀t + (1/2)at²
- calculatePosition(deltaTime) {
-  return this.position.clone().add(this.velocity.multiplyScalar(deltaTime).add(this.acceleration.multiplyScalar(0.5).multiplyScalar(deltaTime).multiplyScalar(deltaTime)));
-}
-
-// دورة التحديث لحركة المظلي
- updateParachutist(deltaTime) {
-  if(this.height<0)
-  return;
-
-
-  this.calculateGravityForce();
-  this.calculateAirResistanceForce();
-  // حساب التسارع()
-  this.height = this.position.y;
-   this.acceleration = this.calculateAcceleration();
-
-  // حساب السرعة الجديدة
-  this.velocity = this.calculateVelocity( deltaTime);
-
-  // حساب الموضع الجديد
-  this.position = this.calculatePosition(deltaTime);
-
-  // عرض نتائج الحركة
- 
-  const valuesContainer = document.getElementById("values-container");
-  valuesContainer.innerHTML = `
-      <p>Position: ${this.position.x.toFixed(2)}, ${this.position.y.toFixed(2)}, ${this.position.z.toFixed(2)}</p>
-      <p>Height: ${this.height.toFixed(2)}</p>
-      <p>Acceleration: ${this.calculateAcceleration().x.toFixed(2)}, ${this.calculateAcceleration().y.toFixed(2)}, ${this.calculateAcceleration().z.toFixed(2)}</p>
-      <p>Velocity: ${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)}, ${this.velocity.z.toFixed(2)}</p>
-      <p>GravityForce: ${this.calculateGravityForce().x.toFixed(2)}, ${this.calculateGravityForce().y.toFixed(2)}, ${this.calculateGravityForce().z.toFixed(2)}</p>
-      <p>AirResistanceForce: ${this.calculateAirResistanceForce().x.toFixed(2)}, ${this.calculateAirResistanceForce().y.toFixed(2)}, ${this.calculateAirResistanceForce().z.toFixed(2)}</p>
-  `;
+{  
+// Calculate the displacement based on variables  
+ calculateDisplacement = (delta, bodyMass, umbrellaMass, previousVelocity, previousDisplacement, surfaceArea, windSpeed, tensileForce) => {
+  const gravity = new THREE.Vector3(0, 9.8, 0);
+  const weightForce = new THREE.Vector3();
+  const dragForce = new THREE.Vector3();
+  const windForce = new THREE.Vector3();
+  tensileForce = tensileForce.multiplyScalar(-1);
+  const totalMass = bodyMass + umbrellaMass;
+  // Calculate weight force
+  weightForce.copy(gravity).multiplyScalar(totalMass);
   
-} 
-   
-         
+  // Calculate drag force
+  const airDensity = 1.2;
+  const dragCoefficient = 0.5;
+  const velocityMagnitude = previousVelocity.length();
+  const dragMagnitude = 0.5 * airDensity * velocityMagnitude * velocityMagnitude * dragCoefficient * surfaceArea;
+  dragForce.copy(previousVelocity).normalize().multiplyScalar(-dragMagnitude);
+  
+  // Calculate wind force
+  const windVelocityMagnitude = windSpeed.length();
+  const windMagnitude = 0.5 * airDensity * windVelocityMagnitude * windVelocityMagnitude * dragCoefficient * surfaceArea;
+  windForce.copy(windSpeed).normalize().multiplyScalar(-windMagnitude);
+
+  // Calculate total forces
+  const totalForces = new THREE.Vector3();
+  totalForces.copy(weightForce).add(dragForce).add(windForce).add(tensileForce);
+  
+  // Calculate acceleration based on total forces
+  const newAcceleration = new THREE.Vector3();
+  newAcceleration.copy(totalForces).divideScalar(totalMass);// a = F / m
+
+  // Calculate new velocity based on the previous velocity and acceleration
+  const newVelocity = new THREE.Vector3();
+  newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta / 1000));// v = v0 + a * t
+  
+  // Calculate new displacement
+  // y = y0 + v0 * t + (1/2) * a * t^2
+  const timeSquared = (delta / 1000) ** 2; // t^2
+  const newDisplacement = new THREE.Vector3();
+  newDisplacement.copy(previousDisplacement).add(previousVelocity.clone().multiplyScalar(delta / 1000)); // y = y0 + v0 * t 
+  newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+  
+  
+  // Return both velocity and displacement
+  return { newVelocity, newDisplacement, newAcceleration };
+};
+
+// Update the position based on the current position and displacement
+ updatePosition = (position, displacement) => {
+  const newPosition = new THREE.Vector3();
+  newPosition.copy(position).sub(displacement);
+
+  // Ensure the object does not go below the ground
+  newPosition.setY(Math.max(newPosition.y, 0));
+
+  return newPosition;
+};
+
          }
- 
+export default parachutist;
