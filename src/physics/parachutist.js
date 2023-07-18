@@ -40,11 +40,14 @@ class parachutist {
 
   const newVelocity = new THREE.Vector3();
   newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
-// // Calculate new displacement
-// const timeSquared = delta ** 2; // t^2
-// const newDisplacement = new THREE.Vector3();
-// newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
-// newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+// // // Calculate new displacement
+// // const timeSquared = delta ** 2; // t^2
+// // const newDisplacement = new THREE.Vector3();
+// // newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
+// // newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+//   // Calculate new displacement
+//   const newDisplacement = new THREE.Vector3();
+//   newDisplacement.copy(previousVelocity).multiplyScalar(delta).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
   // Calculate new displacement
   const newDisplacement = new THREE.Vector3();
   newDisplacement.add(newVelocity.clone().multiplyScalar(delta)).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2

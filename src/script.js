@@ -194,8 +194,9 @@ const valuesContainer = document.getElementById("values-container");
 let displacement = new THREE.Vector3();
 let velocity = new THREE.Vector3(0, 0, 0);
 let tensileForce = new THREE.Vector3(0, 0, 0);
-let surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella;
+let surfaceArea = 0.5;
 const groundPosition = new THREE.Vector3(0, 0, 0);
+
 let newVelocity=new THREE.Vector3(0, 0, 0), newDisplacement=new THREE.Vector3(0, 0, 0), newAcceleration=new THREE.Vector3(0, 0, 0), dragForce=new THREE.Vector3(0, 0, 0), weightForce =new THREE.Vector3(0, 0, 0);
 valuesContainer.innerHTML = `
 <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
@@ -207,7 +208,8 @@ valuesContainer.innerHTML = `
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
     // Update the surface area of the parachute as it opens
-    surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella * scaleOfParrchute / 50;
+    if(scaleOfParrchute>0)
+    surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
 
     let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
     newVelocity=result.newVelocity;
