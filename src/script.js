@@ -3,14 +3,15 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import loadGrassTextures from "./config/GrassTexture";
 import { loadModelsGltf } from "./config/ModelsGltf";
-import { loadModelsObj, animateFeet } from "./config/ModelsObj";
+import { loadModelsObj } from "./config/ModelsObj";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import World from "./physics/world";
 import Parachutist from "./physics/parachutist";
+
 // GUI setup
 const gui = new dat.GUI();
 gui.close();
+
 const updateGUIWidth = (mediaQuery) => {
   gui.width = mediaQuery.matches ? 150 : 250;
 };
@@ -24,19 +25,19 @@ mediaQuery.addListener(updateGUIWidth);
 let windAngle = Math.PI / 2;
 let axesHelper = false;
 let radiusUmbrella = 2;
-let height = 5000;
+let height = 2000;
 let manMass = 80;
+
 let umbrellaMass = 10;
 let windSpeed = new THREE.Vector3(0, 0, 0);
 const paramters = {
   windAngle: Math.PI / 2,
   axesHelper: false,
-  radiusUmbrella: 0.5,
-  height: 20000,
-  manMass: 100,
+  radiusUmbrella: 2,
+  height: 2000,
+  manMass: 80,
   umbrellaMass: 10,
 };
-
 
 
 parachutefolder
@@ -62,34 +63,23 @@ parachutefolder
   .add(paramters, "height", 0, 20000, 10)
   .name("height")
   .onChange(() => {
+    modelsGroup.position.y=paramters.height;
     height = paramters.height;
   });
 
 parachutefolder
-  .add(paramters, "manMass", 0, 1000, 1)
+  .add(paramters, "manMass", 0, 200, 1)
   .name("manMass")
   .onChange(() => {
     manMass = paramters.manMass;
   });
 
-
 parachutefolder
-  .add(paramters, "umbrellaMass", 0, 100, 1)
+  .add(paramters, "umbrellaMass", 0, 50, 1)
   .name("umbrellaMass")
   .onChange(() => {
     umbrellaMass = paramters.umbrellaMass;
   });
-
-
-
-// Add GUI controls for all parameters as text field
-// for (let key in paramters) {
-//   parachutefolder.add(paramters, key).onChange(() => {
-//     parachute[key] = paramters[key];
-//   });
-// }
-
-
 // Scene setup
 const size = {
   width: window.innerWidth,
@@ -124,15 +114,9 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
 }, (loadedModel2) => {
   airplanModel = loadedModel2;
 });
-
-
 scene.add(modelsGroup);
 
-
-
-
 // Event listeners
-
 //document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
@@ -144,8 +128,6 @@ document.addEventListener('keydown', function (event) {
 });
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
-
-
 
 function onMouseMove(event) {
   camera.rotation.y -= event.movementX * 0.004;
@@ -257,6 +239,7 @@ const tick = () => {
 
   }
 
+
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
@@ -269,6 +252,7 @@ const scaleParachute = () => {
     requestAnimationFrame(scaleParachute);
   }
 };
+
 const clock = new THREE.Clock();
 let oldElapsedTime = 0;
 const physics = () => {
@@ -282,8 +266,6 @@ const physics = () => {
   oldElapsedTime = elapsedTime;
 
   requestAnimationFrame(physics);
-}
-
-
+};
 
 tick();

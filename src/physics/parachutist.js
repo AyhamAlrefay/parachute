@@ -47,7 +47,7 @@ class parachutist {
 // newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
   // Calculate new displacement
   const newDisplacement = new THREE.Vector3();
-  newDisplacement.copy(previousVelocity).multiplyScalar(delta).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
+  newDisplacement.add(newVelocity.clone().multiplyScalar(delta)).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
 
     // Return both velocity and displacement
     return { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce };
