@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 class parachutist {
+
   calculateDisplacement = (delta, bodyMass, umbrellaMass, previousVelocity, previousDisplacement, surfaceArea, windSpeed, tensileForce) => {
     const gravity = new THREE.Vector3(0, -9.8, 0);
     const weightForce = new THREE.Vector3();
@@ -32,15 +33,16 @@ class parachutist {
     const newAcceleration = new THREE.Vector3();
     newAcceleration.copy(totalForces).divideScalar(totalMass); // a = F / m
 
-    // Calculate new velocity based on the previous velocity and acceleration
-    const newVelocity = new THREE.Vector3();
-    newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta / 1000)); // v = v0 + a * t
 
-    // Calculate new displacement
-    const timeSquared = (delta / 1000) ** 2; // t^2
-    const newDisplacement = new THREE.Vector3();
-    newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta / 1000)); // y = y0 + v * t 
-    newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+    // Calculate new velocity based on the previous velocity and acceleration
+const newVelocity = new THREE.Vector3();
+newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
+
+// Calculate new displacement
+const timeSquared = delta ** 2; // t^2
+const newDisplacement = new THREE.Vector3();
+newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
+newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
 
     // Return both velocity and displacement
     return { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce };
@@ -52,6 +54,7 @@ class parachutist {
     newPosition.setY(Math.max(newPosition.y, 0)); // Ensure the object does not go below the ground
     return newPosition;
   }
+
 }
 
 export default parachutist;

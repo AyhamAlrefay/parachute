@@ -36,8 +36,14 @@ const paramters = {
   frictionCoeff: 0.8,
   mass: 1000,
   speed: 20,
- 
 };
+
+// Add GUI controls for all parameters
+for (let key in paramters) {
+  worldfolder.add(paramters, key).onChange(() => {
+    world[key] = paramters[key];
+  });
+}
 // Scene setup
 const size = {
   width: window.innerWidth,
@@ -192,7 +198,8 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=10000;
+modelsGroup.position.y=30000;
+
 const p = new Parachutist();
  const valuesContainer = document.getElementById("values-container");
 let displacement = new THREE.Vector3(); 
@@ -200,10 +207,11 @@ let velocity = new THREE.Vector3(0, 0, 0);
 let windSpeed = new THREE.Vector3(0, 0, 0); 
 let tensileForce = new THREE.Vector3(0, 0, 0); 
 let surfaceArea = 20;
-let bodyMass = 50; 
-let umbrellaMass = 1; 
+let bodyMass = 5; 
+let umbrellaMass = 1;  
 const groundPosition = new THREE.Vector3(0, 0, 0);
-const update = (delta) => {
+
+ const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
     let { newVelocity, newDisplacement, newAcceleration } = p.calculateDisplacement(delta, bodyMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
     velocity.copy(newVelocity);
@@ -213,10 +221,17 @@ const update = (delta) => {
     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
     <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
-`;
-  
+    <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+   p <>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+    `;
+  } else {
+    velocity.set(0, 0, 0);
   }
 };
+
+
+
+
 
 
 let scaleOfParrchute=0;// Animation loop
@@ -242,14 +257,11 @@ const scaleParachute = () => {
   }
 };
 const clock = new THREE.Clock();
-let oldElapsedTime = 0;
-const physics=()=>{
-camera.position.set(0, modelsGroup.position.y+20, 720);
-const elapsedTime = clock.getElapsedTime();
-const delteTime = elapsedTime - oldElapsedTime;
-update(delteTime*100);
-  oldElapsedTime = elapsedTime;
 
+const physics = () => {
+  camera.position.set(0, modelsGroup.position.y + 20, 720);
+  const deltaTime = clock.getDelta(); // Get the time difference between frames
+  update(deltaTime * 1000); // Convert deltaTime to milliseconds
   requestAnimationFrame(physics);
 }
 
