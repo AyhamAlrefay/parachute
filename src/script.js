@@ -3,7 +3,7 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import loadGrassTextures from "./config/GrassTexture";
 import { loadModelsGltf } from "./config/ModelsGltf";
-import { loadModelsObj ,animateFeet} from "./config/ModelsObj";
+import { loadModelsObj, animateFeet } from "./config/ModelsObj";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import World from "./physics/world";
@@ -14,36 +14,82 @@ gui.close();
 const updateGUIWidth = (mediaQuery) => {
   gui.width = mediaQuery.matches ? 150 : 250;
 };
-const worldfolder = gui.addFolder("world");
-worldfolder.open();
+const parachutefolder = gui.addFolder("Parachute");
+parachutefolder.open();
 const mediaQuery = window.matchMedia("(max-width: 425px)");
 updateGUIWidth(mediaQuery);
 mediaQuery.addListener(updateGUIWidth);
 
+
+let windAngle = Math.PI / 2;
+let axesHelper = false;
+let radiusUmbrella = 2;
+let height = 5000;
+let manMass = 80;
+let umbrellaMass = 10;
+let windSpeed = new THREE.Vector3(0, 0, 0);
 const paramters = {
-  windSpeed: 10,
   windAngle: Math.PI / 2,
-  angular_speedX: 0,
-  angular_speedY: 1,
-  angular_speedZ: 0,
   axesHelper: false,
-  radius: 0.5,
-  gravity: 9.8,
-  dragCoeff: 0.47,
-  height: 0,
-  tempereture: 15,
-  resistanseCoeff: 0.8,
-  frictionCoeff: 0.8,
-  mass: 1000,
-  speed: 20,
+  radiusUmbrella: 0.5,
+  height: 20000,
+  manMass: 100,
+  umbrellaMass: 10,
 };
 
-// Add GUI controls for all parameters
-for (let key in paramters) {
-  worldfolder.add(paramters, key).onChange(() => {
-    world[key] = paramters[key];
+
+
+parachutefolder
+  .add(paramters, "windAngle", 0, 100, 0.1)
+  .name("windAngle")
+  .onChange(() => {
+    windAngle = paramters.windAngle;
   });
-}
+
+parachutefolder
+  .add(paramters, "axesHelper")
+  .name("axesHelper")
+  .onChange(() => {
+    axesHelper = paramters.axesHelper;
+  });
+parachutefolder
+  .add(paramters, "radiusUmbrella", 0, 5, 0.1)
+  .name("radiusUmbrella")
+  .onChange(() => {
+    radiusUmbrella = paramters.radiusUmbrella;
+  });
+parachutefolder
+  .add(paramters, "height", 0, 20000, 10)
+  .name("height")
+  .onChange(() => {
+    height = paramters.height;
+  });
+
+parachutefolder
+  .add(paramters, "manMass", 0, 1000, 1)
+  .name("manMass")
+  .onChange(() => {
+    manMass = paramters.manMass;
+  });
+
+
+parachutefolder
+  .add(paramters, "umbrellaMass", 0, 100, 1)
+  .name("umbrellaMass")
+  .onChange(() => {
+    umbrellaMass = paramters.umbrellaMass;
+  });
+
+
+
+// Add GUI controls for all parameters as text field
+// for (let key in paramters) {
+//   parachutefolder.add(paramters, key).onChange(() => {
+//     parachute[key] = paramters[key];
+//   });
+// }
+
+
 // Scene setup
 const size = {
   width: window.innerWidth,
@@ -60,17 +106,17 @@ const modelsGroup = new THREE.Group();
 
 // Background setup
 const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
-  const rt = new THREE.WebGLCubeRenderTarget(texture.image.height*5);
+  const rt = new THREE.WebGLCubeRenderTarget(texture.image.height * 5);
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
 // Models
-let manModel, airplanModel,parachuteModel;
+let manModel, airplanModel, parachuteModel;
 // Load textures and models
 const grassTextures = loadGrassTextures(textureLoader);
-loadModelsGltf(scene, gltfLoader,(parachute)=>{
-  parachuteModel=parachute;
- modelsGroup.add(parachuteModel);
+loadModelsGltf(scene, gltfLoader, (parachute) => {
+  parachuteModel = parachute;
+  modelsGroup.add(parachuteModel);
 });
 loadModelsObj(scene, objLoader, (loadedModel1) => {
   manModel = loadedModel1;
@@ -82,64 +128,17 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
 
 scene.add(modelsGroup);
 
-const GRAVITY = 9.8;
-const HEIGHT = 0,
-  TEMPERETURE = 15; // celsius
-const WIND_SPEED = 10,
-  WIND_ANGLE = Math.PI / 2;
-
-  const world = new World(GRAVITY, HEIGHT, TEMPERETURE, WIND_SPEED, WIND_ANGLE);
-
-worldfolder
-  .add(paramters, "gravity", -10, 100, 0.1)
-  .name("gravity")
-  .onChange(() => {
-    world.gravity = paramters.gravity;
-  });
-
-worldfolder
-  .add(paramters, "windSpeed", 0, 100, 0.01)
-  .name("Wind Speed")
-  .onChange(() => {
-    world.wind_speed = paramters.windSpeed;
-  });
-worldfolder
-  .add(paramters, "windAngle", 0, 6.2831853072, 0.2)
-  .name("Wind Angle")
-  .onChange(() => {
-    world.wind_angle = paramters.windAngle;
-    rotateAboutPoint(
-      flag,
-      flagBase.position,
-      new THREE.Vector3(0, 1, 0),
-      paramters.windAngle
-    );
-  });
-worldfolder
-  .add(paramters, "height", -100, 1000, 10)
-  .name("Height")
-  .onChange(() => {
-    world.height = paramters.height;
-  });
-
-worldfolder
-  .add(paramters, "tempereture", -100, 100, 1)
-  .name("Tempereture")
-  .onChange(() => {
-    world.tempereture = paramters.tempereture;
-  });
-
 
 
 
 // Event listeners
 
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('keydown', function(event) {
+//document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
-    scaleParachute();  
+    scaleParachute();
   }
-  if(event.key==='w'){
+  if (event.key === 'w') {
     physics();
   }
 });
@@ -153,7 +152,7 @@ function onMouseMove(event) {
   camera.rotation.x -= event.movementY * 0.004;
 }
 
- function toggleFullScreen() {
+function toggleFullScreen() {
   const fullScreen = document.fullscreenElement || document.webkitFullscreenElement;
   if (!fullScreen) {
     if (canvas.requestFullscreen) {
@@ -206,75 +205,65 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=5000;
+modelsGroup.position.y = height;
 
 const p = new Parachutist();
- const valuesContainer = document.getElementById("values-container");
-let displacement = new THREE.Vector3(); 
-let velocity = new THREE.Vector3(0, 0, 0); 
-let windSpeed = new THREE.Vector3(0, 0, 0); 
-let tensileForce = new THREE.Vector3(0, 0, 0); 
-let surfaceArea = 20;
-let bodyMass = 60; 
-let umbrellaMass = 1;  
+const valuesContainer = document.getElementById("values-container");
+let displacement = new THREE.Vector3();
+let velocity = new THREE.Vector3(0, 0, 0);
+let tensileForce = new THREE.Vector3(0, 0, 0);
+let surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella;
 const groundPosition = new THREE.Vector3(0, 0, 0);
-
-const terminalVelocityThreshold = 15; // You can adjust this value
-const terminalAccelerationThreshold = 0.2; // You can adjust this value
-// Add a new variable to keep track of the parachute opening
-let parachuteOpen = false;
-
-// Modify the update function
+let newVelocity=new THREE.Vector3(0, 0, 0), newDisplacement=new THREE.Vector3(0, 0, 0), newAcceleration=new THREE.Vector3(0, 0, 0), dragForce=new THREE.Vector3(0, 0, 0), weightForce =new THREE.Vector3(0, 0, 0);
+valuesContainer.innerHTML = `
+<p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+<p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+<p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+<p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+<p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+`;
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
-    // Increase the surface area gradually if the parachute is opening
-    if (parachuteOpen) {
-      surfaceArea = Math.min(surfaceArea + 0.1, 50); // Increase the surface area by 0.1 each frame until it reaches 50
-    }
+    // Update the surface area of the parachute as it opens
+    surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella * scaleOfParrchute / 50;
 
-    let { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce } = p.calculateDisplacement(delta, bodyMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+    let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+    newVelocity=result.newVelocity;
+    newDisplacement=result.newDisplacement;
+    newAcceleration=result.newAcceleration;
+    dragForce=result.dragForce;
+    weightForce=result.weightForce;
     velocity.copy(newVelocity);
-    displacement.copy(newDisplacement);
-    modelsGroup.position.copy(p.updatePosition(modelsGroup.position, displacement));
-    if (Math.abs(newVelocity.y) <= terminalVelocityThreshold && Math.abs(newAcceleration.y) <= terminalAccelerationThreshold) {
-      // Trigger parachute opening
-      parachuteOpen = true; // Set the parachute to open
-      scaleParachute();
-    }
-    valuesContainer.innerHTML = `
-    <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
-    <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
-    <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
-    <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
-    <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
-    `;
-
-  } else {
-    velocity.set(0, 0, 0);
-    parachuteModel.position.y=5;
-    parachuteModel.scale.set(50,10,10)
-  }
+     displacement.copy(newDisplacement);
+     modelsGroup.position.copy(p.updatePosition(modelsGroup.position, displacement));
+     valuesContainer.innerHTML = `
+     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+     <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+     <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     `;
+   } else {
+     velocity.set(0, 0, 0);
+   }
 };
 
+let scaleOfParrchute = 0;// Animation loop
 
 
-
-let scaleOfParrchute=0;// Animation loop
-
-  
 const tick = () => {
   if (airplanModel) {
-    airplanModel.position.x+=3;
-    
+    airplanModel.position.x += 3;
+
   }
-   
+
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
 
 const scaleParachute = () => {
   if (scaleOfParrchute <= 50) {
-    parachuteModel.position.y=scaleOfParrchute+30;
+    parachuteModel.position.y = scaleOfParrchute + 30;
     parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
     scaleOfParrchute += 0.5;
     requestAnimationFrame(scaleParachute);
@@ -286,13 +275,15 @@ const physics = () => {
   console.log(paramters.gravity);
   const elapsedTime = clock.getElapsedTime();
   camera.position.set(0, modelsGroup.position.y + 20, 720);
- 
+
   const deltaTime = elapsedTime - oldElapsedTime;
 
-  update(deltaTime ); 
+  update(deltaTime);
   oldElapsedTime = elapsedTime;
 
   requestAnimationFrame(physics);
 }
-tick();
 
+
+
+tick();

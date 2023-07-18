@@ -1,3 +1,5 @@
+
+
 import * as THREE from "three";
 
 class parachutist {
@@ -34,15 +36,18 @@ class parachutist {
     newAcceleration.copy(totalForces).divideScalar(totalMass); // a = F / m
 
 
-    // Calculate new velocity based on the previous velocity and acceleration
-const newVelocity = new THREE.Vector3();
-newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
+ // Calculate new velocity based on the previous velocity and acceleration
 
-// Calculate new displacement
-const timeSquared = delta ** 2; // t^2
-const newDisplacement = new THREE.Vector3();
-newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
-newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+  const newVelocity = new THREE.Vector3();
+  newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
+// // Calculate new displacement
+// const timeSquared = delta ** 2; // t^2
+// const newDisplacement = new THREE.Vector3();
+// newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
+// newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
+  // Calculate new displacement
+  const newDisplacement = new THREE.Vector3();
+  newDisplacement.copy(previousVelocity).multiplyScalar(delta).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
 
     // Return both velocity and displacement
     return { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce };
