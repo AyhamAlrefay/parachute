@@ -206,7 +206,7 @@ const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y=10000;
+modelsGroup.position.y=5000;
 
 const p = new Parachutist();
  const valuesContainer = document.getElementById("values-container");
@@ -219,12 +219,28 @@ let bodyMass = 60;
 let umbrellaMass = 1;  
 const groundPosition = new THREE.Vector3(0, 0, 0);
 
+const terminalVelocityThreshold = 15; // You can adjust this value
+const terminalAccelerationThreshold = 0.2; // You can adjust this value
+// Add a new variable to keep track of the parachute opening
+let parachuteOpen = false;
+
+// Modify the update function
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
+    // Increase the surface area gradually if the parachute is opening
+    if (parachuteOpen) {
+      surfaceArea = Math.min(surfaceArea + 0.1, 50); // Increase the surface area by 0.1 each frame until it reaches 50
+    }
+
     let { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce } = p.calculateDisplacement(delta, bodyMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
     velocity.copy(newVelocity);
     displacement.copy(newDisplacement);
     modelsGroup.position.copy(p.updatePosition(modelsGroup.position, displacement));
+    if (Math.abs(newVelocity.y) <= terminalVelocityThreshold && Math.abs(newAcceleration.y) <= terminalAccelerationThreshold) {
+      // Trigger parachute opening
+      parachuteOpen = true; // Set the parachute to open
+      scaleParachute();
+    }
     valuesContainer.innerHTML = `
     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
@@ -232,14 +248,13 @@ const update = (delta) => {
     <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
     <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
     `;
+
   } else {
     velocity.set(0, 0, 0);
-  
+    parachuteModel.position.y=5;
+    parachuteModel.scale.set(50,10,10)
   }
 };
-
-
-
 
 
 
@@ -261,7 +276,7 @@ const scaleParachute = () => {
   if (scaleOfParrchute <= 50) {
     parachuteModel.position.y=scaleOfParrchute+30;
     parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
-    scaleOfParrchute += 1;
+    scaleOfParrchute += 0.5;
     requestAnimationFrame(scaleParachute);
   }
 };
@@ -279,9 +294,5 @@ const physics = () => {
 
   requestAnimationFrame(physics);
 }
-
-
-
-
 tick();
 
