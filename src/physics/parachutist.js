@@ -25,7 +25,8 @@ class parachutist {
     // Calculate wind force
     const windVelocityMagnitude = windSpeed.length();
     const windMagnitude = 0.5 * airDensity * windVelocityMagnitude * windVelocityMagnitude * dragCoefficient * surfaceArea;
-    windForce.copy(windSpeed).multiplyScalar(-windMagnitude);
+    windForce.copy(windSpeed).multiplyScalar(windMagnitude);
+ 
 
     // Calculate total forces
     const totalForces = new THREE.Vector3();
@@ -45,10 +46,7 @@ class parachutist {
 // // const newDisplacement = new THREE.Vector3();
 // // newDisplacement.copy(previousDisplacement).add(newVelocity.clone().multiplyScalar(delta)); // y = y0 + v * t 
 // // newDisplacement.add(newAcceleration.clone().multiplyScalar(0.5 * timeSquared)); // y = y + (1/2) * a * t^2
-//   // Calculate new displacement
-//   const newDisplacement = new THREE.Vector3();
-//   newDisplacement.copy(previousVelocity).multiplyScalar(delta).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
-  // Calculate new displacement
+
   const newDisplacement = new THREE.Vector3();
   newDisplacement.add(newVelocity.clone().multiplyScalar(delta)).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
 
