@@ -27,7 +27,6 @@ let axesHelper = false;
 let radiusUmbrella = 2;
 let height = 1000;
 let manMass = 80;
-
 let umbrellaMass = 10;
 let windSpeed = new THREE.Vector3(0, 0, 0);
 const paramters = {
@@ -39,6 +38,7 @@ const paramters = {
   manMass: 80,
   umbrellaMass: 10,
 };
+
 
   parachutefolder
   .add(paramters, "windAngle", -Math.PI, Math.PI, 0.1)
@@ -130,8 +130,6 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
 });
 scene.add(modelsGroup);
 
-// Event listeners
-// document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
     openScaleParachute();
@@ -146,11 +144,6 @@ document.addEventListener('keydown', function (event) {
 });
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
-
-function onMouseMove(event) {
-  camera.rotation.y -= event.movementX * 0.004;
-  camera.rotation.x -= event.movementY * 0.004;
-}
 
 function toggleFullScreen() {
   const fullScreen = document.fullscreenElement || document.webkitFullscreenElement;
@@ -183,10 +176,6 @@ scene.add(camera);
 // Lighting setup
 const ambientLight = new THREE.AmbientLight("white", 0.75);
 scene.add(ambientLight);
-
-/*
-    Sounds
-*/
 const audioListener = new THREE.AudioListener();
 camera.add(audioListener);
 const shootingSoundEffect = new THREE.Audio(audioListener);
@@ -233,7 +222,6 @@ valuesContainer.innerHTML = `
 `;
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
-    // Update the surface area of the parachute as it opens
     if(scaleOfParrchute>0)
  {
   surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
@@ -241,7 +229,8 @@ const update = (delta) => {
    surfaceArea = 0.5;
  }
 
-    let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+ 
+ let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
     newVelocity=result.newVelocity;
     newDisplacement=result.newDisplacement;
     newAcceleration=result.newAcceleration;
@@ -311,7 +300,6 @@ const closeScaleParachute = () => {
     requestAnimationFrame(closeScaleParachute);
   }
 };
-
 
 
 const clock = new THREE.Clock();

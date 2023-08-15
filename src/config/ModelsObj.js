@@ -2,13 +2,13 @@ import { TextureLoader } from 'three';
 const textureLoader = new TextureLoader();
 
 
-let leftFootParts = []; // Array to store the left foot parts
-let rightFootParts = []; // Array to store the right foot parts
-let leftFootPartsInitialPositions = []; // Array to store the initial positions of the left foot parts
+let leftFootParts = []; 
+let rightFootParts = [];
+let leftFootPartsInitialPositions = []; 
 let rightFootPartsInitialPositions = [];
-let leftHandParts = []; // Array to store the left foot parts
-let rightHandParts = []; // Array to store the right foot parts
-let leftHandPartsInitialPositions = []; // Array to store the initial positions of the left foot parts
+let leftHandParts = []; 
+let rightHandParts = []; 
+let leftHandPartsInitialPositions = []; 
 let rightHandPartsInitialPositions = [];
 
 
@@ -72,11 +72,11 @@ const model1Promise = new Promise((resolve, reject) => {
           
           if (child.name.includes("Ninja_T01:")) {
             if (child.name.includes("Protector_Mano_IZ") || child.name.includes("Mano_IZ")) {
-              leftHandParts.push(child); // Store the left foot part
-              leftHandPartsInitialPositions.push(child.position.clone()); // Store the initial position of the left foot part
+              leftHandParts.push(child); 
+              leftHandPartsInitialPositions.push(child.position.clone()); 
             } else if (child.name.includes("Protector_Mano_DE") || child.name.includes("Mano_DE")) {
-              rightHandParts.push(child); // Store the right foot part
-              rightHandPartsInitialPositions.push(child.position.clone()); // Store the initial position of the right foot part
+              rightHandParts.push(child); 
+              rightHandPartsInitialPositions.push(child.position.clone());
             }
           
           
@@ -103,7 +103,7 @@ const model1Promise = new Promise((resolve, reject) => {
       objModel.position.set(24.6, 5, 100); // Set the position of the model
       scene.add(objModel);
       setModel1(objModel);
-      resolve();
+      resolve(); 
     }, null, reject);
   });
 
@@ -113,11 +113,11 @@ const model1Promise = new Promise((resolve, reject) => {
         if (child.isMesh) {
           child.material.map = piperDiffuseTexture;
           child.material.needsUpdate = true;
-        }
+        } 
       });
-      objModel.position.set(-1000, 1000, -500);
-      objModel.rotation.set(0, Math.PI/2, 0); 
-      objModel.scale.set(20, 20, 20); // Corrected line
+      objModel.position.set(-1000, 1000, -500); 
+      objModel.rotation.set(0, Math.PI/2, 0) ;  
+      objModel.scale.set(20, 20, 20); 
       scene.add(objModel);
       setModel2(objModel);
       resolve();
