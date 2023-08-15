@@ -130,7 +130,7 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
 scene.add(modelsGroup);
 
 // Event listeners
-document.addEventListener('mousemove', onMouseMove);
+// document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
     scaleParachute();
@@ -251,6 +251,16 @@ const update = (delta) => {
      `;
    } else {
      velocity.set(0, 0, 0);
+     scaleOfParrchute=0;
+     parachuteModel.rotation.z=90;
+     parachuteModel.position.y=0;
+     valuesContainer.innerHTML = `
+     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+     <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+     <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     `;
    }
 };
 
