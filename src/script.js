@@ -58,6 +58,7 @@ parachutefolder
   .name("radiusUmbrella")
   .onChange(() => {
     radiusUmbrella = paramters.radiusUmbrella;
+    
   });
 parachutefolder
   .add(paramters, "height", 0, 20000, 10)
@@ -120,7 +121,10 @@ scene.add(modelsGroup);
 //document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
-    scaleParachute();
+    openScaleParachute();
+  }
+  if(event.key==='c'){
+    closeScaleParachute();
   }
   if (event.key === 'w') {
     physics();
@@ -209,7 +213,11 @@ const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
     // Update the surface area of the parachute as it opens
     if(scaleOfParrchute>0)
-    surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
+ {
+  surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
+ }else{
+   surfaceArea = 0.5;
+ }
 
     let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
     newVelocity=result.newVelocity;
@@ -241,19 +249,31 @@ const tick = () => {
 
   }
 
-
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
 
-const scaleParachute = () => {
-  if (scaleOfParrchute <= 50) {
+const openScaleParachute = () => {
+  if (scaleOfParrchute <= 20*radiusUmbrella) {
     parachuteModel.position.y = scaleOfParrchute + 30;
     parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
     scaleOfParrchute += 0.5;
-    requestAnimationFrame(scaleParachute);
+    if (scaleOfParrchute > 20 * radiusUmbrella) {
+      scaleOfParrchute -=0.5;
+    }
+    requestAnimationFrame(openScaleParachute);
   }
 };
+
+const closeScaleParachute = () => {
+  if (scaleOfParrchute > 0) {
+    parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
+    scaleOfParrchute -= 0.5;
+    requestAnimationFrame(closeScaleParachute);
+  }
+};
+
+
 
 const clock = new THREE.Clock();
 let oldElapsedTime = 0;
