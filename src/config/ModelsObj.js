@@ -115,7 +115,7 @@ const model1Promise = new Promise((resolve, reject) => {
           child.material.needsUpdate = true;
         }
       });
-      objModel.position.set(-1000, 800, -500);
+      objModel.position.set(-1000, 1000, -500);
       objModel.rotation.set(0, Math.PI/2, 0); 
       objModel.scale.set(20, 20, 20); // Corrected line
       scene.add(objModel);

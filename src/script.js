@@ -25,13 +25,14 @@ mediaQuery.addListener(updateGUIWidth);
 let windAngle = Math.PI / 2;
 let axesHelper = false;
 let radiusUmbrella = 2;
-let height = 2000;
+let height = 1000;
 let manMass = 80;
 
 let umbrellaMass = 10;
 let windSpeed = new THREE.Vector3(0, 0, 0);
 const paramters = {
   windAngle: Math.PI / 2,
+  windSpeed:15,
   axesHelper: false,
   radiusUmbrella: 2,
   height: 2000,
@@ -39,14 +40,21 @@ const paramters = {
   umbrellaMass: 10,
 };
 
-
-parachutefolder
-  .add(paramters, "windAngle", 0, 100, 0.1)
+  parachutefolder
+  .add(paramters, "windAngle", -Math.PI, Math.PI, 0.1)
   .name("windAngle")
   .onChange(() => {
-    windAngle = paramters.windAngle;
+      windAngle = paramters.windAngle;
+      windSpeed.set(Math.cos(windAngle),0,Math.sin(windAngle));
+    
   });
-
+  parachutefolder
+  .add(paramters, "windSpeed", -100, 100, 1)
+  .name("windSpeed")
+  .onChange(() => {
+   
+    windSpeed.set(paramters.windSpeed, 0, 0);
+  });
 parachutefolder
   .add(paramters, "axesHelper")
   .name("axesHelper")
@@ -93,6 +101,11 @@ const loadingManager = new THREE.LoadingManager();
 const gltfLoader = new GLTFLoader(loadingManager);
 const objLoader = new OBJLoader(loadingManager);
 const textureLoader = new THREE.TextureLoader(loadingManager);
+const audioLoader = new THREE.AudioLoader(loadingManager);
+audioLoader.load("sounds/audio1.mp3", (audioBuffer) => {
+  shootingSoundEffect.setBuffer(audioBuffer);
+});
+
 const modelsGroup = new THREE.Group();
 
 // Background setup
@@ -118,7 +131,7 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
 scene.add(modelsGroup);
 
 // Event listeners
-//document.addEventListener('mousemove', onMouseMove);
+// document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
     openScaleParachute();
@@ -127,6 +140,7 @@ document.addEventListener('keydown', function (event) {
     closeScaleParachute();
   }
   if (event.key === 'w') {
+    modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y - 10, airplanModel.position.z);
     physics();
   }
 });
@@ -169,6 +183,14 @@ scene.add(camera);
 // Lighting setup
 const ambientLight = new THREE.AmbientLight("white", 0.75);
 scene.add(ambientLight);
+
+/*
+    Sounds
+*/
+const audioListener = new THREE.AudioListener();
+camera.add(audioListener);
+const shootingSoundEffect = new THREE.Audio(audioListener);
+scene.add(shootingSoundEffect);
 
 // Floor setup
 const floor = new THREE.Mesh(
@@ -237,16 +259,31 @@ const update = (delta) => {
      `;
    } else {
      velocity.set(0, 0, 0);
+     scaleOfParrchute=0;
+     parachuteModel.rotation.z=90;
+     parachuteModel.position.y=0;
+     valuesContainer.innerHTML = `
+     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+     <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+     <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+     `;
    }
 };
 
 let scaleOfParrchute = 0;// Animation loop
 
+let boolSound=true;
 
 const tick = () => {
-  if (airplanModel) {
+  if (airplanModel ) {
+   if(boolSound==true){
+    shootingSoundEffect.play();
+    boolSound=false;
+   }
     airplanModel.position.x += 3;
-
+    
   }
 
   renderer.render(scene, camera);
@@ -263,6 +300,8 @@ const openScaleParachute = () => {
     }
     requestAnimationFrame(openScaleParachute);
   }
+  if (modelsGroup.position.y <= groundPosition.y)
+  parachuteModel.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z);
 };
 
 const closeScaleParachute = () => {
@@ -281,7 +320,6 @@ const physics = () => {
   console.log(paramters.gravity);
   const elapsedTime = clock.getElapsedTime();
   camera.position.set(0, modelsGroup.position.y + 20, 720);
-
   const deltaTime = elapsedTime - oldElapsedTime;
 
   update(deltaTime);
@@ -289,5 +327,6 @@ const physics = () => {
 
   requestAnimationFrame(physics);
 };
+
 
 tick();
