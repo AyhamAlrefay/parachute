@@ -39,16 +39,16 @@ const paramters = {
 };
 
   parachutefolder
-  .add(paramters, "windAngle", -Math.PI, Math.PI, 0.1)
+  .add(paramters, "windAngle", 0,2* Math.PI, 0.1)
   .name("windAngle")
   .onChange(() => {
       windAngle = paramters.windAngle;
-      windSpeed.set(Math.cos(windAngle),0,Math.sin(windAngle));
+
     
   });
 
   parachutefolder
-  .add(paramters, "windSpeed", -100, 100, 1)
+  .add(paramters, "windSpeed", 0, 1000, 1)
   .name("windSpeed")
   .onChange(() => {
    
@@ -146,8 +146,10 @@ document.addEventListener('keydown', function (event) {
     modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y - 10, airplanModel.position.z);
     physics();
   }
+
   if (event.key === 'p') {
     activeCamera = activeCamera === parachutistCamera ? planeCamera : parachutistCamera;
+
   }
 });
 
@@ -211,9 +213,14 @@ function onWindowResize() {
 
 
 
+
 // Lighting setup
 const ambientLight = new THREE.AmbientLight("white", 0.75);
 scene.add(ambientLight);
+
+/*
+    Sounds
+*/
 const audioListener = new THREE.AudioListener();
 planeCamera.add(audioListener);
 const shootingSoundEffect = new THREE.Audio(audioListener);
@@ -268,6 +275,7 @@ modelsGroup.add(parachutistCamera);
 
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
+    // Update the surface area of the parachute as it opens
     if(scaleOfParrchute>0)
  {
   surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
@@ -276,7 +284,7 @@ const update = (delta) => {
  }
 
  
- let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+ let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce,windAngle);
     newVelocity=result.newVelocity;
     newDisplacement=result.newDisplacement;
     newAcceleration=result.newAcceleration;
@@ -307,6 +315,9 @@ const update = (delta) => {
    }
   
 };
+
+
+
 
 let scaleOfParrchute = 0;// Animation loop
 
