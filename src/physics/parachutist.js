@@ -14,22 +14,22 @@ class Parachutist {
     return weightForce;
   }
 
-  // Calculate drag force (F_drag = 0.5 * rho * v^2 * C_d * A)
-  calculateDragForce(previousVelocity, surfaceArea) {
-    const dragForce = new THREE.Vector3();
-    const velocityMagnitude = previousVelocity.length();
-    const dragMagnitude =
-      0.5 *
-      this.airDensity *
-      velocityMagnitude *
-      velocityMagnitude *
-      this.dragCoefficient *
-      surfaceArea;
-    dragForce
-      .copy(previousVelocity)
-      .normalize()
-      .multiplyScalar(-dragMagnitude);
+  // Calculate drag force (F_drag = 0.5 * rho * v^2 * C_d * A) 
+  calculateDragForce(previousVelocity, surfaceArea) { 
+    const dragForce = new THREE.Vector3() ;  
+    const velocity  = previousVelocity.length() ;
+    const dragMagnitude =0.5 * this.airDensity * velocity * velocity * this.dragCoefficient * surfaceArea;
+    dragForce.copy(previousVelocity).normalize().multiplyScalar(-dragMagnitude);
     return dragForce;
+  }
+
+  calcWindVelo(windSpeed, wind_angle) {
+    const windForce = new THREE.Vector3() ;  
+    return new THREE.Vector3(
+      Number(Math.cos(wind_angle).toFixed(2)) *  windSpeed.length(),
+      0,
+      Math.sin(wind_angle) *  windSpeed.length()
+    );
   }
 
   // Calculate wind force (F_wind = 0.5 * rho * v_wind^2 * C_d * A)
@@ -100,7 +100,8 @@ class Parachutist {
     previousDisplacement,
     surfaceArea,
     windSpeed,
-    tensileForce
+    tensileForce,
+    wind_angle
   ) {
     
 const totalMass = bodyMass + umbrellaMass;
@@ -109,7 +110,7 @@ const weightForce = this.calculateWeightForce(totalMass);
 
 const dragForce = this.calculateDragForce(previousVelocity, surfaceArea);
 
-const windForce = this.calculateWindForce(windSpeed, surfaceArea);
+const windForce = this.calcWindVelo(windSpeed, wind_angle);
 
 const totalForces = this.calculateTotalForces(
 weightForce,
@@ -139,63 +140,63 @@ return newPosition;
 export default Parachutist;
 
 
-// import * as THREE from "three";
+  // import * as THREE from "three";
 
-// class parachutist {
+  // class parachutist {
 
-//   calculateDisplacement = (delta, bodyMass, umbrellaMass, previousVelocity, previousDisplacement, surfaceArea, windSpeed, tensileForce) => {
-//     const gravity = new THREE.Vector3(0, -9.8, 0);
-//     const weightForce = new THREE.Vector3();
-//     const dragForce = new THREE.Vector3();
-//     const windForce = new THREE.Vector3();
-//     tensileForce = tensileForce.multiplyScalar(-1);
-//     const totalMass = bodyMass + umbrellaMass;
+  //   calculateDisplacement = (delta, bodyMass, umbrellaMass, previousVelocity, previousDisplacement, surfaceArea, windSpeed, tensileForce) => {
+  //     const gravity = new THREE.Vector3(0, -9.8, 0);
+  //     const weightForce = new THREE.Vector3();
+  //     const dragForce = new THREE.Vector3();
+  //     const windForce = new THREE.Vector3();
+  //     tensileForce = tensileForce.multiplyScalar(-1);
+  //     const totalMass = bodyMass + umbrellaMass;
 
-//     // Calculate weight force
-//     weightForce.copy(gravity).multiplyScalar(totalMass);
+  //     // Calculate weight force
+  //     weightForce.copy(gravity).multiplyScalar(totalMass);
 
-//     // Calculate drag force
-//     const airDensity = 1.2;
-//     const dragCoefficient = 0.5;
-//     const velocityMagnitude = previousVelocity.length();
-//     const dragMagnitude = 0.5 * airDensity * velocityMagnitude * velocityMagnitude * dragCoefficient * surfaceArea;
-//     dragForce.copy(previousVelocity).normalize().multiplyScalar(-dragMagnitude);
+  //     // Calculate drag force
+  //     const airDensity = 1.2;
+  //     const dragCoefficient = 0.5;
+  //     const velocityMagnitude = previousVelocity.length();
+  //     const dragMagnitude = 0.5 * airDensity * velocityMagnitude * velocityMagnitude * dragCoefficient * surfaceArea;
+  //     dragForce.copy(previousVelocity).normalize().multiplyScalar(-dragMagnitude);
 
-//     // Calculate wind force
-//     const windVelocityMagnitude = windSpeed.length();
-//     const windMagnitude = 0.5 * airDensity * windVelocityMagnitude * windVelocityMagnitude * dragCoefficient * surfaceArea;
-//     windForce.copy(windSpeed).multiplyScalar(windMagnitude);
- 
+  //     // Calculate wind force
+  //     const windVelocityMagnitude = windSpeed.length();
+  //     const windMagnitude = 0.5 * airDensity * windVelocityMagnitude * windVelocityMagnitude * dragCoefficient * surfaceArea;
+  //     windForce.copy(windSpeed).multiplyScalar(windMagnitude);
+  
 
-//     // Calculate total forces
-//     const totalForces = new THREE.Vector3();
-//     totalForces.copy(weightForce).add(dragForce).add(windForce).add(tensileForce);
+  //     // Calculate total forces
+  //     const totalForces = new THREE.Vector3();
+  //     totalForces.copy(weightForce).add(dragForce).add(windForce).add(tensileForce);
 
-//     // Calculate acceleration based on total forces
-//     const newAcceleration = new THREE.Vector3();
-//     newAcceleration.copy(totalForces).divideScalar(totalMass); // a = F / m
+  //     // Calculate acceleration based on total forces
+  //     const newAcceleration = new THREE.Vector3();
+  //     newAcceleration.copy(totalForces).divideScalar(totalMass); // a = F / m
 
 
-//  // Calculate new velocity based on the previous velocity and acceleration
+  //  // Calculate new velocity based on the previous velocity and acceleration
 
-//   const newVelocity = new THREE.Vector3();
-//   newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
-// // // // Calculate new displacement
-//   const newDisplacement = new THREE.Vector3();
-//   newDisplacement.add(newVelocity.clone().multiplyScalar(delta)).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
+  //   const newVelocity = new THREE.Vector3();
+  //   newVelocity.copy(previousVelocity).add(newAcceleration.clone().multiplyScalar(delta)); // v = v0 + a * t
+  // // // // Calculate new displacement
+  //   const newDisplacement = new THREE.Vector3();
+  //   newDisplacement.add(newVelocity.clone().multiplyScalar(delta)).add(newAcceleration.clone().multiplyScalar(0.5 * delta * delta)); // y = y0 + v * t + (1/2) * a * t^2
 
-//     // Return both velocity and displacement
-//     return { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce };
-//   };
+  //     // Return both velocity and displacement
+  //     return { newVelocity, newDisplacement, newAcceleration, dragForce, weightForce };
+  //   };
 
-//   updatePosition(position, displacement) {
-//     const newPosition = new THREE.Vector3();
-//     newPosition.copy(position).add(displacement); // Add the displacement to the current position
-//     newPosition.setY(Math.max(newPosition.y, 0)); // Ensure the object does not go below the ground
-//     return newPosition;
-//   }
+  //   updatePosition(position, displacement) {
+  //     const newPosition = new THREE.Vector3();
+  //     newPosition.copy(position).add(displacement); // Add the displacement to the current position
+  //     newPosition.setY(Math.max(newPosition.y, 0)); // Ensure the object does not go below the ground
+  //     return newPosition;
+  //   }
 
-// }
+  // }
 
-// export default parachutist;
+  // export default parachutist;
 

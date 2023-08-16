@@ -23,7 +23,6 @@ mediaQuery.addListener(updateGUIWidth);
 
 
 let windAngle = Math.PI / 2;
-let axesHelper = false;
 let radiusUmbrella = 2;
 let height = 1000;
 let manMass = 80;
@@ -41,26 +40,21 @@ const paramters = {
 
 
   parachutefolder
-  .add(paramters, "windAngle", -Math.PI, Math.PI, 0.1)
+  .add(paramters, "windAngle", 0,2* Math.PI, 0.1)
   .name("windAngle")
   .onChange(() => {
       windAngle = paramters.windAngle;
-      windSpeed.set(Math.cos(windAngle),0,Math.sin(windAngle));
+   //   windSpeed.set(Math.cos(windAngle),0,Math.sin(windAngle));
     
   });
   parachutefolder
-  .add(paramters, "windSpeed", -100, 100, 1)
+  .add(paramters, "windSpeed", 0, 1000, 1)
   .name("windSpeed")
   .onChange(() => {
    
     windSpeed.set(paramters.windSpeed, 0, 0);
   });
-parachutefolder
-  .add(paramters, "axesHelper")
-  .name("axesHelper")
-  .onChange(() => {
-    axesHelper = paramters.axesHelper;
-  });
+
 parachutefolder
   .add(paramters, "radiusUmbrella", 0, 5, 0.1)
   .name("radiusUmbrella")
@@ -141,6 +135,19 @@ document.addEventListener('keydown', function (event) {
     modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y - 10, airplanModel.position.z);
     physics();
   }
+
+  if (event.key === 'ArrowUp') {
+    camera.position.z -= 10; // Move the camera forward
+  }
+  if (event.key === 'ArrowDown') {
+    camera.position.z += 10; // Move the camera backward
+  }
+  if (event.key === 'ArrowLeft') {
+    camera.position.x -= 10; // Move the camera left
+  }
+  if (event.key === 'ArrowRight') {
+    camera.position.x += 10; // Move the camera right
+  }
 });
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
@@ -173,9 +180,14 @@ const camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 16
 camera.position.set(0, 10, 720);
 scene.add(camera);
 
+
 // Lighting setup
 const ambientLight = new THREE.AmbientLight("white", 0.75);
 scene.add(ambientLight);
+
+/*
+    Sounds
+*/
 const audioListener = new THREE.AudioListener();
 camera.add(audioListener);
 const shootingSoundEffect = new THREE.Audio(audioListener);
@@ -222,6 +234,7 @@ valuesContainer.innerHTML = `
 `;
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
+    // Update the surface area of the parachute as it opens
     if(scaleOfParrchute>0)
  {
   surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
@@ -230,7 +243,7 @@ const update = (delta) => {
  }
 
  
- let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce);
+ let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, displacement, surfaceArea, windSpeed, tensileForce,windAngle);
     newVelocity=result.newVelocity;
     newDisplacement=result.newDisplacement;
     newAcceleration=result.newAcceleration;
@@ -261,6 +274,9 @@ const update = (delta) => {
    }
 };
 
+
+
+
 let scaleOfParrchute = 0;// Animation loop
 
 let boolSound=true;
@@ -274,6 +290,10 @@ const tick = () => {
     airplanModel.position.x += 3;
     
   }
+
+  camera.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z + 520);
+
+
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
