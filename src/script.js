@@ -7,6 +7,7 @@ import { loadModelsObj } from "./config/ModelsObj";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import Parachutist from "./physics/parachutist";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // GUI setup
 const gui = new dat.GUI();
@@ -69,6 +70,9 @@ parachutefolder
   .onChange(() => {
     modelsGroup.position.y=paramters.height;
     height = paramters.height;
+    parachutistCamera.position.set(0, paramters.height , 360);
+    parachutistCamera.lookAt(modelsGroup.position);
+    // controls.lookAt(modelsGroup.position);
   });
 
 parachutefolder
@@ -122,12 +126,14 @@ let manModel, airplanModel, parachuteModel;
 loadModelsGltf(scene, gltfLoader, (parachute) => {
   parachuteModel = parachute;
   modelsGroup.add(parachuteModel);
-  parachutistCamera.position.set(parachuteModel.position.x, parachuteModel.position.y + 50, parachuteModel.position.z);
-  parachutistCamera.lookAt(parachuteModel.position);
+  parachutistCamera.position.set(modelsGroup.position.x, modelsGroup.position.y , modelsGroup.position.z);
+  parachutistCamera.lookAt(modelsGroup.position);
+
 });
 
 loadModelsObj(scene, objLoader, (loadedModel1) => {
   manModel = loadedModel1;
+
   modelsGroup.add(manModel);
  
 }, (loadedModel2) => {
@@ -143,7 +149,7 @@ document.addEventListener('keydown', function (event) {
     closeScaleParachute();
   }
   if (event.key === 'w') {
-    modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y - 10, airplanModel.position.z);
+    modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y , airplanModel.position.z);
     physics();
   }
 
@@ -190,16 +196,18 @@ function toggleFullScreen() {
 
 // Parachutist camera
 
-const parachutistCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
+const parachutistCamera = new THREE.PerspectiveCamera(25, size.width / size.height, 0.1, 5000);
 scene.add(parachutistCamera);
 
 // Plane camera
 
-const planeCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
+const planeCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 2000);
 planeCamera.position.set(0, 10, 720);
 scene.add(planeCamera);
 
 let activeCamera = parachutistCamera;
+
+
 
 function onWindowResize() {
   size.width = window.innerWidth;
@@ -272,6 +280,7 @@ valuesContainer.innerHTML = `
 `;
 // Attach the camera to the modelsGroup
 modelsGroup.add(parachutistCamera);
+const controls = new OrbitControls(parachutistCamera, renderer.domElement);
 
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
@@ -300,6 +309,7 @@ const update = (delta) => {
      <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
      <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
      `;
+     controls.target.copy(modelsGroup.position);
    } else {
      velocity.set(0, 0, 0);
      scaleOfParrchute=0;
@@ -334,7 +344,6 @@ const tick = () => {
     airplanModel.position.x += 3;
     
   }
-
   renderer.render(scene, activeCamera);
   requestAnimationFrame(tick);
 };
@@ -367,9 +376,10 @@ let oldElapsedTime = 0;
 const physics = () => {
   console.log(paramters.gravity);
   const elapsedTime = clock.getElapsedTime();
-  parachutistCamera.position.set(0, modelsGroup.position.y + 20, 360);
+  parachutistCamera.position.set(0, modelsGroup.position.y , 360);
    // Update the camera's position and orientation
-   parachutistCamera.lookAt(modelsGroup.position);
+  parachutistCamera.lookAt(modelsGroup.position);
+
   const deltaTime = elapsedTime - oldElapsedTime;
 
   update(deltaTime);
