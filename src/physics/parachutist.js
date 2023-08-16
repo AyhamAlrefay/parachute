@@ -26,10 +26,23 @@ class Parachutist {
   calcWindVelo(windSpeed, wind_angle) {
   
     return new THREE.Vector3(
-      Number(Math.cos(wind_angle).toFixed(2))*10 *  windSpeed.length(),
+      Number(Math.cos(wind_angle).toFixed(2)) *  windSpeed.length(),
       0,
-      Math.sin(wind_angle)*10 *  windSpeed.length()
+      Math.sin(wind_angle) *  windSpeed.length()
     );
+  }
+
+
+
+  wind_force(rho, wind_velo,surfaceArea) {
+    let velocitySquere = new THREE.Vector3(wind_velo.x ** 2, wind_velo.y ** 2, wind_velo.z ** 2);
+    let normalize = wind_velo.clone().normalize();
+
+    let wind = new THREE.Vector3(
+      (velocitySquere.x  / 2) * rho * surfaceArea * normalize.x, 0,
+(velocitySquere.z / 2) * rho * surfaceArea * normalize.z
+    );
+    return wind;
   }
 
 
@@ -83,7 +96,6 @@ class Parachutist {
     bodyMass,
     umbrellaMass,
     previousVelocity,
-    previousDisplacement,
     surfaceArea,
     windSpeed,
     tensileForce,
@@ -96,7 +108,8 @@ const weightForce = this.calculateWeightForce(totalMass);
 
 const dragForce = this.calculateDragForce(previousVelocity, surfaceArea);
 
-const windForce = this.calcWindVelo(windSpeed, wind_angle);
+const windyForce = this.calcWindVelo(windSpeed, wind_angle);
+const windForce = this.wind_force(this.airDensity, windyForce,surfaceArea);
 
 const totalForces = this.calculateTotalForces(
 weightForce,
@@ -117,7 +130,7 @@ return {newVelocity,newDisplacement,newAcceleration,dragForce,weightForce};
 // Update position based on displacement
 updatePosition(position, displacement) {
 const newPosition = new THREE.Vector3();
-newPosition.copy(position).add(displacement); // Add the displacement to the current position
+newPosition.copy(position).add(displacement); // Add the displacement to the current position 
 newPosition.setY(Math.max(newPosition.y, 0)); // Ensure the object does not go below the ground
 return newPosition;
 }
