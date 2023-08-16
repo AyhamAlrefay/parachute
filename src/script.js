@@ -22,33 +22,32 @@ updateGUIWidth(mediaQuery);
 mediaQuery.addListener(updateGUIWidth);
 
 
-let windAngle = Math.PI / 2;
+let windAngle = 0;
 let radiusUmbrella = 2;
 let height = 1000;
 let manMass = 80;
 let umbrellaMass = 10;
-let windSpeed = new THREE.Vector3(0, 0, 0);
-
+let windSpeed = new THREE.Vector3(20, 0, 0);
 const paramters = {
-  windAngle: Math.PI / 2,
-  windSpeed:15,
+  windAngle: 0,
+  windSpeed:20,
+  axesHelper: false,
   radiusUmbrella: 2,
   height: 2000,
   manMass: 80,
   umbrellaMass: 10,
 };
 
+
   parachutefolder
   .add(paramters, "windAngle", 0,2* Math.PI, 0.1)
   .name("windAngle")
   .onChange(() => {
       windAngle = paramters.windAngle;
-
     
   });
-
   parachutefolder
-  .add(paramters, "windSpeed", 0, 1000, 1)
+  .add(paramters, "windSpeed", 0, 100, 1)
   .name("windSpeed")
   .onChange(() => {
    
@@ -56,13 +55,12 @@ const paramters = {
   });
 
 parachutefolder
-  .add(paramters, "radiusUmbrella", 0, 5, 0.1)
+  .add(paramters, "radiusUmbrella", 0, 10, 0.1)
   .name("radiusUmbrella")
   .onChange(() => {
     radiusUmbrella = paramters.radiusUmbrella;
     
   });
-
 parachutefolder
   .add(paramters, "height", 0, 20000, 10)
   .name("height")
@@ -84,9 +82,7 @@ parachutefolder
   .onChange(() => {
     umbrellaMass = paramters.umbrellaMass;
   });
-
 // Scene setup
-
 const size = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -94,7 +90,6 @@ const size = {
 const scene = new THREE.Scene();
 
 // Loaders setup
-
 const loadingManager = new THREE.LoadingManager();
 const gltfLoader = new GLTFLoader(loadingManager);
 const objLoader = new OBJLoader(loadingManager);
@@ -112,24 +107,17 @@ const texture = textureLoader.load("textures/skybox/FS002_Day.png", () => {
   rt.fromEquirectangularTexture(renderer, texture);
   scene.background = rt.texture;
 });
-// Load textures
-
-const grassTextures = loadGrassTextures(textureLoader);
-
 // Models
-
 let manModel, airplanModel, parachuteModel;
+// Load textures and models
+const grassTextures = loadGrassTextures(textureLoader);
 loadModelsGltf(scene, gltfLoader, (parachute) => {
   parachuteModel = parachute;
   modelsGroup.add(parachuteModel);
-  parachutistCamera.position.set(parachuteModel.position.x, parachuteModel.position.y + 50, parachuteModel.position.z);
-  parachutistCamera.lookAt(parachuteModel.position);
 });
-
 loadModelsObj(scene, objLoader, (loadedModel1) => {
   manModel = loadedModel1;
   modelsGroup.add(manModel);
- 
 }, (loadedModel2) => {
   airplanModel = loadedModel2;
 });
@@ -147,30 +135,19 @@ document.addEventListener('keydown', function (event) {
     physics();
   }
 
-  if (event.key === 'p') {
-    activeCamera = activeCamera === parachutistCamera ? planeCamera : parachutistCamera;
-
+  if (event.key === 'ArrowUp') {
+    camera.position.z -= 10; // Move the camera forward
+  }
+  if (event.key === 'ArrowDown') {
+    camera.position.z += 10; // Move the camera backward
+  }
+  if (event.key === 'ArrowLeft') {
+    camera.position.x -= 10; // Move the camera left
+  }
+  if (event.key === 'ArrowRight') {
+    camera.position.x += 10; // Move the camera right
   }
 });
-
-document.addEventListener('keydown', function (event) {
-  const moveAmount = 10; // Adjust to desired speed
-  switch (event.key) {
-    case 'ArrowLeft': // left arrow
-      planeCamera.position.x -= moveAmount;
-      break;
-    case 'ArrowRight': // right arrow
-      planeCamera.position.x += moveAmount;
-      break;
-    case 'ArrowUp': // up arrow
-      planeCamera.position.y += moveAmount;
-      break;
-    case 'ArrowDown': // down arrow
-      planeCamera.position.y -= moveAmount;
-      break;
-  }
-});
-
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
@@ -188,30 +165,19 @@ function toggleFullScreen() {
   }
 }
 
-// Parachutist camera
-
-const parachutistCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
-scene.add(parachutistCamera);
-
-// Plane camera
-
-const planeCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
-planeCamera.position.set(0, 10, 720);
-scene.add(planeCamera);
-
-let activeCamera = parachutistCamera;
-
 function onWindowResize() {
   size.width = window.innerWidth;
   size.height = window.innerHeight;
-
-  activeCamera.aspect = size.width / size.height;
-  activeCamera.updateProjectionMatrix();
+  camera.aspect = size.width / size.height;
+  camera.updateProjectionMatrix();
   renderer.setSize(size.width, size.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
-
+// Camera setup
+const camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
+camera.position.set(0, 10, 720);
+scene.add(camera);
 
 
 // Lighting setup
@@ -222,12 +188,9 @@ scene.add(ambientLight);
     Sounds
 */
 const audioListener = new THREE.AudioListener();
-planeCamera.add(audioListener);
+camera.add(audioListener);
 const shootingSoundEffect = new THREE.Audio(audioListener);
 scene.add(shootingSoundEffect);
-
-
-
 
 // Floor setup
 const floor = new THREE.Mesh(
@@ -244,8 +207,6 @@ const floor = new THREE.Mesh(
 );
 floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
-
-
 
 // Renderer setup
 const canvas = document.querySelector(".webgl");
@@ -270,9 +231,6 @@ valuesContainer.innerHTML = `
 <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
 <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
 `;
-// Attach the camera to the modelsGroup
-modelsGroup.add(parachutistCamera);
-
 const update = (delta) => {
   if (modelsGroup.position.y > groundPosition.y) {
     // Update the surface area of the parachute as it opens
@@ -302,9 +260,6 @@ const update = (delta) => {
      `;
    } else {
      velocity.set(0, 0, 0);
-     scaleOfParrchute=0;
-     parachuteModel.rotation.z=90;
-     parachuteModel.position.y=0;
      valuesContainer.innerHTML = `
      <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
      <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
@@ -313,7 +268,6 @@ const update = (delta) => {
      <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
      `;
    }
-  
 };
 
 
@@ -323,19 +277,22 @@ let scaleOfParrchute = 0;// Animation loop
 
 let boolSound=true;
 
-
-
 const tick = () => {
   if (airplanModel ) {
    if(boolSound==true){
     shootingSoundEffect.play();
     boolSound=false;
    }
+   if(airplanModel.position.x<1000)
     airplanModel.position.x += 3;
     
   }
 
-  renderer.render(scene, activeCamera);
+  camera.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z + 520);
+
+
+
+  renderer.render(scene, camera);
   requestAnimationFrame(tick);
 };
 
@@ -350,7 +307,7 @@ const openScaleParachute = () => {
     requestAnimationFrame(openScaleParachute);
   }
   if (modelsGroup.position.y <= groundPosition.y)
-  parachuteModel.position.set(modelsGroup.position.x, modelsGroup.position.y + 50, 20);
+  parachuteModel.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z);
 };
 
 const closeScaleParachute = () => {
@@ -367,9 +324,7 @@ let oldElapsedTime = 0;
 const physics = () => {
   console.log(paramters.gravity);
   const elapsedTime = clock.getElapsedTime();
-  parachutistCamera.position.set(0, modelsGroup.position.y + 20, 360);
-   // Update the camera's position and orientation
-   parachutistCamera.lookAt(modelsGroup.position);
+  camera.position.set(0, modelsGroup.position.y + 20, 720);
   const deltaTime = elapsedTime - oldElapsedTime;
 
   update(deltaTime);
@@ -380,4 +335,3 @@ const physics = () => {
 
 
 tick();
-

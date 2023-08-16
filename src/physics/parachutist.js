@@ -26,9 +26,9 @@ class Parachutist {
   calcWindVelo(windSpeed, wind_angle) {
   
     return new THREE.Vector3(
-      Number(Math.cos(wind_angle).toFixed(2)) *  windSpeed.length(),
+      Number(Math.cos(wind_angle).toFixed(2))*10 *  windSpeed.length(),
       0,
-      Math.sin(wind_angle) *  windSpeed.length()
+      Math.sin(wind_angle)*10 *  windSpeed.length()
     );
   }
 
