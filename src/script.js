@@ -32,7 +32,6 @@ let windSpeed = new THREE.Vector3(10, 0, 0);
 const paramters = {
   windAngle: 0,
   windSpeed:10,
-  axesHelper: false,
   radiusUmbrella: 2,
   height: 1000,
   manMass: 80,

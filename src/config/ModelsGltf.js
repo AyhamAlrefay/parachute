@@ -11,13 +11,13 @@ export const loadModelsGltf = (scene, gltfLoader,parachuteModel) => {
   const lambert1Normal = textureLoader.load("models/parachute/textures/lambert1_normal.png");
   // Load and add clouds to the scene
   gltfLoader.load("models/clouds/scene.gltf",(gltfModel)=>{
-  gltfModel.scene.scale.set(1.5,1.5,1.5);
-   
+  gltfModel.scene.scale.set(1,1,1);
+
   for(let i=0;i<150;i++){
 const clouds=gltfModel.scene.clone();
 clouds.position.x=(Math.random()-0.5)*1000;
 clouds.position.z = (Math.random() - 0.5) * 1000;
-clouds.rotation.y = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+clouds.position.y = Math.floor(Math.random() * (5000 - 1000 + 1)) + 800;
 scene.add(clouds);
   }
   });
