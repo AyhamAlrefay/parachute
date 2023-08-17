@@ -55,7 +55,7 @@ const paramters = {
   });
 
 parachutefolder
-  .add(paramters, "radiusUmbrella", 0, 10, 0.1)
+  .add(paramters, "radiusUmbrella", 0, 5  , 0.1)
   .name("radiusUmbrella")
   .onChange(() => {
     radiusUmbrella = paramters.radiusUmbrella;
