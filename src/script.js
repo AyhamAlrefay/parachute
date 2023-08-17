@@ -34,7 +34,7 @@ const paramters = {
   windSpeed:10,
   axesHelper: false,
   radiusUmbrella: 2,
-  height: 2000,
+  height: 1000,
   manMass: 80,
   umbrellaMass: 10,
 };
@@ -68,9 +68,6 @@ parachutefolder
   .onChange(() => {
     modelsGroup.position.y=paramters.height;
     height = paramters.height;
-    parachutistCamera.position.set(0, paramters.height , 360);
-    parachutistCamera.lookAt(modelsGroup.position);
-    // controls.lookAt(modelsGroup.position);
   });
 
 parachutefolder
@@ -119,9 +116,6 @@ loadModelsGltf(scene, gltfLoader, (parachute) => {
   parachuteModel = parachute;
   modelsGroup.add(parachuteModel);
 
-  parachutistCamera.position.set(modelsGroup.position.x, modelsGroup.position.y , modelsGroup.position.z);
-  parachutistCamera.lookAt(modelsGroup.position);
-
 });
 loadModelsObj(scene, objLoader, (loadedModel1) => {
   manModel = loadedModel1;
@@ -131,6 +125,15 @@ loadModelsObj(scene, objLoader, (loadedModel1) => {
   airplanModel = loadedModel2;
 });
 scene.add(modelsGroup);
+let mouseControlEnabled = false; // Default to mouse control
+let isNewCameraActive = false;
+
+
+let isRotatingX = false;
+let isRotatingZ = false;
+let rotationAngleX = 0;
+let rotationAngleZ = 0;
+const rotationSpeed = Math.PI / 180;
 
 document.addEventListener('keydown', function (event) {
   if (event.key === 'o') {
@@ -141,22 +144,91 @@ document.addEventListener('keydown', function (event) {
   }
   if (event.key === 'w') {
     modelsGroup.position.set(airplanModel.position.x, airplanModel.position.y , airplanModel.position.z);
+    modelsGroup.scale.set(1, 1, 1);
     physics();
+    isNewCameraActive = true;
   }
 
+  if (event.key === 'm') {
+    mouseControlEnabled = !mouseControlEnabled;
+  }
+  
+  if (event.key === 'p') {
+    isNewCameraActive = !isNewCameraActive;
+  }
   if (event.key === 'ArrowUp') {
-    camera.position.z -= 10; // Move the camera forward
-  }
-  if (event.key === 'ArrowDown') {
-    camera.position.z += 10; // Move the camera backward
-  }
-  if (event.key === 'ArrowLeft') {
-    camera.position.x -= 10; // Move the camera left
-  }
-  if (event.key === 'ArrowRight') {
-    camera.position.x += 10; // Move the camera right
+    if (isNewCameraActive && !isRotatingX) {
+      rotateXModelsAndCamera('up');
+    }
+  } else if (event.key === 'ArrowDown') {
+    if (isNewCameraActive && !isRotatingX) {
+      rotateXModelsAndCamera('down');
+    }
+  } else if (event.key === 'ArrowLeft') {
+    if (isNewCameraActive && !isRotatingZ) {
+      rotateZModelsAndCamera('left');
+    }
+  } else if (event.key === 'ArrowRight') {
+    if (isNewCameraActive && !isRotatingZ) {
+      rotateZModelsAndCamera('right');
+    }
   }
 });
+
+
+function rotateXModelsAndCamera(direction) {
+  isRotatingX = true;
+  rotationAngleX = 0; // Reset rotation angle
+
+  function rotateXStep() {
+    if (Math.abs(rotationAngleX) < Math.PI / 9) { // Rotate by 30 degrees (π/6 radians)
+      const rotationIncrement = (direction === 'up') ? rotationSpeed : -rotationSpeed;
+      modelsGroup.rotation.x += rotationIncrement;
+      newCamera.rotation.x += rotationIncrement;
+
+      const moveIncrement = 1; // Adjust this value based on how much you want to move along the rotation
+      modelsGroup.position.y += moveIncrement * Math.cos(modelsGroup.rotation.x);
+      modelsGroup.position.z += moveIncrement * Math.sin(modelsGroup.rotation.x);
+      newCamera.position.y += moveIncrement * Math.cos(newCamera.rotation.x);
+      newCamera.position.z += moveIncrement * Math.sin(newCamera.rotation.x);
+
+      rotationAngleX += rotationSpeed;
+      requestAnimationFrame(rotateXStep);
+    } else {
+      isRotatingX = false;
+    }
+  }
+
+  rotateXStep();
+}
+
+function rotateZModelsAndCamera(direction) {
+  isRotatingZ = true;
+  rotationAngleZ = 0; // Reset rotation angle
+
+  function rotateZStep() {
+    if (Math.abs(rotationAngleZ) < Math.PI / 9) { // Rotate by 30 degrees (π/6 radians)
+      const rotationIncrement = (direction === 'right') ? rotationSpeed : -rotationSpeed;
+      modelsGroup.rotation.z += rotationIncrement;
+      newCamera.rotation.z += rotationIncrement;
+
+      const moveIncrement = 1; // Adjust this value based on how much you want to move along the rotation
+      modelsGroup.position.x += moveIncrement * Math.cos(modelsGroup.rotation.z);
+      modelsGroup.position.y += moveIncrement * Math.sin(modelsGroup.rotation.z);
+      newCamera.position.x += moveIncrement * Math.cos(newCamera.rotation.z);
+      newCamera.position.y += moveIncrement * Math.sin(newCamera.rotation.z);
+
+      rotationAngleZ += rotationSpeed;
+      requestAnimationFrame(rotateZStep);
+    } else {
+      isRotatingZ = false;
+    }
+  }
+
+  rotateZStep();
+}
+
+
 window.addEventListener("dblclick", toggleFullScreen);
 window.addEventListener("resize", onWindowResize);
 
@@ -174,23 +246,10 @@ function toggleFullScreen() {
   }
 }
 
-// Parachutist camera
-
-const parachutistCamera = new THREE.PerspectiveCamera(25, size.width / size.height, 0.1, 5000);
-scene.add(parachutistCamera);
-
-// Plane camera
-
-const planeCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 2000);
-planeCamera.position.set(0, 10, 720);
-scene.add(planeCamera);
-
-let activeCamera = parachutistCamera;
-
 
 function onWindowResize() {
-  size.width = window.innerWidth;
-  size.height = window.innerHeight;
+ size.width = window.innerWidth;
+ size.height = window.innerHeight;
   camera.aspect = size.width / size.height;
   camera.updateProjectionMatrix();
   renderer.setSize(size.width, size.height);
@@ -199,7 +258,7 @@ function onWindowResize() {
 
 // Camera setup
 const camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
-camera.position.set(0, 10, 720);
+camera.position.set(0,30, 30);
 scene.add(camera);
 
 
@@ -232,19 +291,19 @@ floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
 
 // Renderer setup
-const canvas = document.querySelector(".webgl");
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(size.width, size.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-modelsGroup.position.y = height;
-
-const p = new Parachutist();
-const valuesContainer = document.getElementById("values-container");
-let displacement = new THREE.Vector3();
-let velocity = new THREE.Vector3(0, 0, 0);
-let tensileForce = new THREE.Vector3(0, 0, 0);
-let surfaceArea = 0.5;
-const groundPosition = new THREE.Vector3(0, 0, 0);
+ const canvas = document.querySelector(".webgl");
+ const renderer = new THREE.WebGLRenderer({ canvas });
+ renderer.setSize(size.width, size.height);
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+ modelsGroup.position.y = height;
+ modelsGroup.scale.set(0, 0, 0);
+ const p = new Parachutist();
+ const valuesContainer = document.getElementById("values-container");
+ let displacement = new THREE.Vector3();
+ let velocity = new THREE.Vector3(0, 0, 0);
+ let tensileForce = new THREE.Vector3(0, 0, 0);
+ let surfaceArea = 0.5;
+ const groundPosition = new THREE.Vector3(0, 0, 0);
 
 let newVelocity=new THREE.Vector3(0, 0, 0), newDisplacement=new THREE.Vector3(0, 0, 0), newAcceleration=new THREE.Vector3(0, 0, 0), dragForce=new THREE.Vector3(0, 0, 0), weightForce =new THREE.Vector3(0, 0, 0);
 valuesContainer.innerHTML = `
@@ -254,13 +313,11 @@ valuesContainer.innerHTML = `
 <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
 <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
 `;
-// Attach the camera to the modelsGroup
-modelsGroup.add(parachutistCamera);
-const controls = new OrbitControls(parachutistCamera, renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
 
 const update = (delta) => {
-  if (modelsGroup.position.y > groundPosition.y) {
-    // Update the surface area of the parachute as it opens
+   if (modelsGroup.position.y > groundPosition.y) {
     if(scaleOfParrchute>0)
  {
   surfaceArea = Math.PI * radiusUmbrella * radiusUmbrella ;
@@ -269,13 +326,13 @@ const update = (delta) => {
  }
 
  
- let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, surfaceArea, windSpeed, tensileForce,windAngle);
-    newVelocity=result.newVelocity;
-    newDisplacement=result.newDisplacement;
-    newAcceleration=result.newAcceleration;
-    dragForce=result.dragForce;
-    weightForce=result.weightForce;
-    velocity.copy(newVelocity);
+  let result = p.calculateDisplacement(delta, manMass, umbrellaMass, velocity, surfaceArea, windSpeed, tensileForce,windAngle);
+     newVelocity=result.newVelocity;
+     newDisplacement=result.newDisplacement;
+     newAcceleration=result.newAcceleration;
+     dragForce=result.dragForce;
+     weightForce=result.weightForce;
+     velocity.copy(newVelocity);
      displacement.copy(newDisplacement);
      modelsGroup.position.copy(p.updatePosition(modelsGroup.position, displacement));
      valuesContainer.innerHTML = `
@@ -285,80 +342,112 @@ const update = (delta) => {
      <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
      <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
      `;
-     controls.target.copy(modelsGroup.position);
-   } else {
-     velocity.set(0, 0, 0);
-     valuesContainer.innerHTML = `
-     <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
-     <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
-     <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
-     <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
-     <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
-     `;
-   }
-};
-
-
-
-
-let scaleOfParrchute = 0;// Animation loop
-
-let boolSound=true;
-
-const tick = () => {
-  if (airplanModel ) {
-   if(boolSound==true){
-    shootingSoundEffect.play();
-    boolSound=false;
-   }
-   if(airplanModel.position.x<1000)
-    airplanModel.position.x += 3;
-    
-  }
-  renderer.render(scene, activeCamera);
-  requestAnimationFrame(tick);
-};
-
-const openScaleParachute = () => {
-  if (scaleOfParrchute <= 20*radiusUmbrella) {
-    parachuteModel.position.y = scaleOfParrchute + 30;
-    parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
-    scaleOfParrchute += 0.5;
-    if (scaleOfParrchute > 20 * radiusUmbrella) {
-      scaleOfParrchute -=0.5;
+      controls.target.copy(modelsGroup.position);
+   }  else {
+      velocity.set(0, 0, 0);
+      valuesContainer.innerHTML = `
+      <p>Position: ${modelsGroup.position.x.toFixed(2)}, ${modelsGroup.position.y.toFixed(2)}, ${modelsGroup.position.z.toFixed(2)}</p>
+      <p>Acceleration: ${newAcceleration.x.toFixed(2)}, ${newAcceleration.y.toFixed(2)}, ${newAcceleration.z.toFixed(2)}</p>
+      <p>Velocity: ${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)}, ${velocity.z.toFixed(2)}</p>
+      <p>DragForce: ${dragForce.x.toFixed(2)}, ${dragForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+      <p>WeightForce: ${weightForce.x.toFixed(2)},${weightForce.y.toFixed(2)}, ${dragForce.z.toFixed(2)}</p>
+      `;
     }
-    requestAnimationFrame(openScaleParachute);
+};
+
+ let scaleOfParrchute = 0;
+
+ let boolSound=true;
+const newCamera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 1600);
+newCamera.position.set(0, 3, -10);
+newCamera.rotation.y=-Math.PI ;
+scene.add(newCamera);
+
+const airplaneCamera = new THREE.PerspectiveCamera(60, size.width / size.height, 0.1, 1600);
+airplaneCamera.position.set(0, 3, -10); 
+airplaneCamera.rotation.y=-Math.PI / 2;
+let mouseX = 0;
+let mouseY = 0;
+const mouseSensitivity = 0.002;
+
+document.addEventListener('mousemove', (event) => {
+  if (mouseControlEnabled) {
+    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
   }
-  if (modelsGroup.position.y <= groundPosition.y)
-  parachuteModel.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z);
-};
+});
 
-const closeScaleParachute = () => {
-  if (scaleOfParrchute > 0) {
-    parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
-    scaleOfParrchute -= 0.5;
-    requestAnimationFrame(closeScaleParachute);
+
+ const tick = () => {
+   if (airplanModel ) {
+    if(boolSound==true){
+     shootingSoundEffect.play();
+     boolSound=false;
+    }
+    if(airplanModel.position.x<2000)
+    { airplanModel.position.x += 3;}
+     airplaneCamera.position.set(airplanModel.position.x-200, airplanModel.position.y+50,airplanModel.position.z);  
+   if (isNewCameraActive === true ) {
+    newCamera.position.set(modelsGroup.position.x+20, modelsGroup.position.y+50,modelsGroup.position.z-30); 
+    renderer.render(scene, newCamera); 
   }
-};
+  if(isNewCameraActive === false){
+    renderer.render(scene, airplaneCamera); 
+  }
+  }
+  if (mouseControlEnabled) {
+    const cameraYaw = mouseSensitivity * (mouseX - 0.5);
+    const cameraPitch = mouseSensitivity * (mouseY - 0.5);
+    camera.rotation.x -= cameraPitch;
+    camera.rotation.y -= cameraYaw;
+    renderer.render(scene, camera); 
+  } else {
+
+    
+   if (isNewCameraActive === true ) {
+    renderer.render(scene, newCamera); 
+   }
+   if(isNewCameraActive === false){
+     renderer.render(scene, airplaneCamera); 
+   }
+   }
+  
+   requestAnimationFrame(tick);
+ };
+
+ const openScaleParachute = () => {
+   if (scaleOfParrchute <= 20*radiusUmbrella) {
+     parachuteModel.position.y = scaleOfParrchute + 30;
+     parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
+     scaleOfParrchute += 0.5;
+     if (scaleOfParrchute > 20 * radiusUmbrella) {
+       scaleOfParrchute -=0.5;
+     }
+     requestAnimationFrame(openScaleParachute);
+   }
+   if (modelsGroup.position.y <= groundPosition.y)
+   parachuteModel.position.set(modelsGroup.position.x, modelsGroup.position.y + 20, modelsGroup.position.z);
+ };
+
+ const closeScaleParachute = () => {
+   if (scaleOfParrchute > 0) {
+     parachuteModel.scale.set(scaleOfParrchute, scaleOfParrchute, scaleOfParrchute);
+     scaleOfParrchute -= 0.5;
+     requestAnimationFrame(closeScaleParachute);
+   }
+ };
 
 
-const clock = new THREE.Clock();
-let oldElapsedTime = 0;
-const physics = () => {
-  console.log(paramters.gravity);
-  const elapsedTime = clock.getElapsedTime();
-
-  parachutistCamera.position.set(0, modelsGroup.position.y , 60);
-   // Update the camera's position and orientation
-  parachutistCamera.lookAt(modelsGroup.position);
-
-  const deltaTime = elapsedTime - oldElapsedTime;
-
-  update(deltaTime);
-  oldElapsedTime = elapsedTime;
-
-  requestAnimationFrame(physics);
-};
+ const clock = new THREE.Clock();
+ let oldElapsedTime = 0;
+ const physics = () => {
+   console.log(paramters.gravity);
+   const elapsedTime = clock.getElapsedTime();
+   const deltaTime = elapsedTime - oldElapsedTime;
+   update(deltaTime);
+   oldElapsedTime = elapsedTime;
+   requestAnimationFrame(physics);
+ };
 
 
-tick();
+ tick();
