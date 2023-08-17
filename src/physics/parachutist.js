@@ -24,7 +24,7 @@ class Parachutist {
   }
 
   calcWindVelo(windSpeed, wind_angle) {
-  
+
     return new THREE.Vector3(
       Number(Math.cos(wind_angle).toFixed(2)) *  windSpeed.length(),
       0,
@@ -44,7 +44,11 @@ class Parachutist {
     );
     return wind;
   }
-
+calculateTensileForce(k, x) {
+  const tensileForce = new THREE.Vector3();
+  tensileForce.set(0, -k * x, 0);
+  return tensileForce;
+}
 
   // Calculate total forces (F_total = F_weight + F_drag + F_wind + F_tensile)
   calculateTotalForces(
@@ -98,10 +102,11 @@ class Parachutist {
     previousVelocity,
     surfaceArea,
     windSpeed,
-    tensileForce,
+    k,
+    x,
     wind_angle
   ) {
-    
+
 const totalMass = bodyMass + umbrellaMass;
 
 const weightForce = this.calculateWeightForce(totalMass);
@@ -110,7 +115,7 @@ const dragForce = this.calculateDragForce(previousVelocity, surfaceArea);
 
 const windyForce = this.calcWindVelo(windSpeed, wind_angle);
 const windForce = this.wind_force(this.airDensity, windyForce,surfaceArea);
-
+const tensileForce = this.calculateTensileForce(k, x);
 const totalForces = this.calculateTotalForces(
 weightForce,
 dragForce,
